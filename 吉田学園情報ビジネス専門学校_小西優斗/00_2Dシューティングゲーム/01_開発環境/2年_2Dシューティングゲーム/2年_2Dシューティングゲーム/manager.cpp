@@ -8,48 +8,16 @@
 //=============================================================================
 // インクルード
 //=============================================================================
-#include "bg.h"
-#include "bomb.h"
-#include "bomb_ui.h"
-#include "boss.h"
-#include "bullet.h"
-#include "crow.h"
-#include "effect.h"
-#include "enemy.h"
-#include "explosion.h"
 #include "fade.h"
-#include "fire.h"
-#include "flash.h"
 #include "game.h"
-#include "hpbar.h"
-#include "icon.h"
 #include "joypad.h"
 #include "keyboard.h"
-#include "laser.h"
-#include "light.h"
 #include "manager.h"
-#include "message.h"
-#include "muzzle_flash.h"
-#include "number.h"
-#include "player.h"
-#include "ranking.h"
 #include "renderer.h"
 #include "result.h"
-#include "resultbg.h"
-#include "scene2d.h"
-#include "score.h"
-#include "shield.h"
-#include "shock.h"
 #include "sound.h"
-#include "spark.h"
-#include "start_logo.h"
-#include "surroundings.h"
 #include "title.h"
-#include "titlebg.h"
-#include "tutorial.h"
-#include "ui.h"
-#include "gage.h"
-#include "warning.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -119,36 +87,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	}
 
 	// テクスチャのロード
-	CPlayer::Load();
-	CBullet::Load();
-	CShield::Load();
-	CEnemy::Load();
-	CBackground::Load();
-	CExplosion::Load();
-	CUi::Load();
-	CLight::Load();
-	CEffect::Load();
-	CLaser::Load();
-	CNumber::Load();
-	CBoss::Load();
-	CTitleBg::Load();
-	CResultBg::Load();
-	CHpbar::Load();
-	CFlash::Load();
-	CGage::Load();
-	CMuzzleFlash::Load();
-	CWarning::Load();
-	CShock::Load();
-	CSpark::Load();
-	CFire::Load();
-	CIcon::Load();
-	CMessage::Load();
-	CSurroundings::Load();
-	CStartLogo::Load();
-	CBomb::Load();
-	CCrow::Load();
-	CTutorial::Load();
-	CBombUi::Load();
+	CTexture::Load();
 
 	// サウンド初期化処理
 	m_pSound = new CSound;
@@ -207,36 +146,8 @@ void CManager::Uninit(void)
 
 	// 全てのリリース
 	CScene::ReleaseAll();
-	CBullet::UnLoad();
-	CEnemy::UnLoad();
-	CBackground::UnLoad();
-	CExplosion::UnLoad();
-	CShield::UnLoad();
-	CPlayer::UnLoad();
-	CUi::UnLoad();
-	CLight::UnLoad();
-	CEffect::UnLoad();
-	CLaser::UnLoad();
-	CNumber::UnLoad();
-	CBoss::UnLoad();
-	CTitleBg::UnLoad();
-	CResultBg::UnLoad();
-	CHpbar::UnLoad();
-	CFlash::UnLoad();
-	CGage::UnLoad();
-	CMuzzleFlash::UnLoad();
-	CWarning::UnLoad();
-	CShock::UnLoad();
-	CSpark::UnLoad();
-	CFire::UnLoad();
-	CIcon::UnLoad();
-	CMessage::UnLoad();
-	CSurroundings::UnLoad();
-	CStartLogo::UnLoad();
-	CBomb::UnLoad();
-	CCrow::UnLoad();
-	CTutorial::UnLoad();
-	CBombUi::UnLoad();
+	// テクスチャのアンロード
+	CTexture::UnLoad();
 
 	// 使われていた時
 	if (m_pRenderer != NULL)

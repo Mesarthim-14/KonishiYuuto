@@ -36,7 +36,7 @@ public:
 		D3DXVECTOR2 tex;	// テクスチャ座標
 	}VERTEX_2D;
 
-	CPolygon();										// コンストラクタ
+	CPolygon(TYPE Priority = TYPE_NONE);										// コンストラクタ
 	virtual ~CPolygon();							// デストラクタ
 
 	virtual HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);			// 初期化処理

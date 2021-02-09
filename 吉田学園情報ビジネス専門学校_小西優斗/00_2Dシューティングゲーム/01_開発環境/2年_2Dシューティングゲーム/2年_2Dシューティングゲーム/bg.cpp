@@ -11,18 +11,22 @@
 #include "bg.h"
 #include "renderer.h"
 #include "manager.h"
+#include "texture.h"
 
 //=============================================================================
-// static初期化
+// マクロ定義
 //=============================================================================
-LPDIRECT3DTEXTURE9 CBackground::m_apTexture[MAX_BG_TEXTURE] = {};
+#define MAX_BG				(3)			// BGの数
+#define BG_SPEED			(2)			// スピード
+#define BG_DIVISION_BASE	(0.008f)	// スクロールの基本値
+#define BG_DIVISION			(0.004f)	// スクロールの値
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CBackground::CBackground()
+CBackground::CBackground(TYPE Priority) : CScene(Priority)
 {
-	for (int nCount = 0; nCount < MAX_BG_TEXTURE; nCount++)
+	for (int nCount = 0; nCount < MAX_BG; nCount++)
 	{
 		m_apScene2D[nCount] = NULL;
 	}
@@ -50,57 +54,21 @@ CBackground * CBackground::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 }
 
 //=============================================================================
-// テクスチャのロード
-//=============================================================================
-HRESULT CBackground::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bg006.png",
-		&m_apTexture[0]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bg100.png",
-		&m_apTexture[1]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bg004.png",
-		&m_apTexture[2]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャのアンロード
-//=============================================================================
-void CBackground::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_BG_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT CBackground::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
-	for (int nCount = 0; nCount < MAX_BG_TEXTURE; nCount++)
+	for (int nCount = 0; nCount < MAX_BG; nCount++)
 	{
 		// 使われていないとき
 		if (m_apScene2D[nCount] == NULL)
 		{
 			// 初期化処理
 			m_apScene2D[nCount] = new CScene2D;									// メモリ確保
-			m_apScene2D[nCount]->InitScroll(2, 0.008f + 0.004f*(float)nCount);	// スクロール情報
+			m_apScene2D[nCount]->InitScroll(BG_SPEED, BG_DIVISION_BASE + BG_DIVISION*(float)nCount);	// スクロール情報
 			m_apScene2D[nCount]->Init(pos, size, type);							// 初期化情報
-			m_apScene2D[nCount]->BindTexture(m_apTexture[nCount]);				// テクスチャ情報
+			m_apScene2D[nCount]->BindTexture(CTexture::GetTexture((CTexture::TEXTURE_TYPE)((int)CTexture::TEXTURE_NUM_BG_000 + nCount)));				// テクスチャ情報
+
 		}
 	}
 
@@ -112,7 +80,7 @@ HRESULT CBackground::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //=============================================================================
 void CBackground::Uninit(void)
 {
-	for (int nCount = 0; nCount < MAX_BG_TEXTURE; nCount++)
+	for (int nCount = 0; nCount < MAX_BG; nCount++)
 	{
 		if (m_apScene2D[nCount] != NULL)
 		{
@@ -131,7 +99,7 @@ void CBackground::Uninit(void)
 //=============================================================================
 void CBackground::Update(void)
 {
-	for (int nCount = 0; nCount < MAX_BG_TEXTURE; nCount++)
+	for (int nCount = 0; nCount < MAX_BG; nCount++)
 	{
 		if (m_apScene2D[nCount] != NULL)
 		{

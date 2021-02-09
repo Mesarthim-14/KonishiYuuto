@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "alert.h"
+#include "texture.h"
 
 //====================================================================
 // マクロ定義
@@ -20,11 +21,6 @@
 #define START_LOGO_COLOR_MAX	(150)		// カラー変更の最大
 #define START_LOGO_COLOR_MIN	(0)			// カラー変更の最小
 #define START_LOGO_CHANGE_TIME	(35)		// カラーを変えるフレーム
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CStartLogo::m_apTexture[MAX_START_LOGO_TEXTURE] = {};
 
 //====================================================================
 // ポリゴン生成
@@ -38,8 +34,9 @@ CStartLogo * CStartLogo::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	{
 		// 初期化処理
 		pStartLogo->Init(pos, size, type);
+
 		// テクスチャの設定
-		pStartLogo->BindTexture(m_apTexture[0]);
+		pStartLogo->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_START_LOGO));
 
 		// サイズを代入
 		pStartLogo->m_size = size;
@@ -50,7 +47,7 @@ CStartLogo * CStartLogo::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CStartLogo::CStartLogo()
+CStartLogo::CStartLogo() : CScene2D(TYPE_UI)
 {
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_nFlashFlame = 0;
@@ -106,39 +103,6 @@ void CStartLogo::Draw(void)
 {
 	// 描画処理
 	CScene2D::Draw();
-}
-
-//====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CStartLogo::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/StartLogo.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CStartLogo::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_START_LOGO_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }
 
 //====================================================================

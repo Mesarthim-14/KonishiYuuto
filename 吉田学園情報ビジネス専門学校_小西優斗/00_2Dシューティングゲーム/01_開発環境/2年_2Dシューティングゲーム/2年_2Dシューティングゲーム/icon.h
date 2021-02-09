@@ -1,9 +1,8 @@
 #ifndef _ICON_H_
 #define _ICON_H_
-
 //=============================================================================
 //
-// アイコンヘッダー	[icon.h]
+// アイコンクラスヘッダー	[icon.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -18,7 +17,6 @@
 //=============================================================================
 #define ICON_SIZE_X			(50.0f)			// サイズ
 #define ICON_SIZE_Y			(50.0f)			// サイズ
-#define MAX_ICON_TEXTURE	(1)				// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -31,7 +29,7 @@ class CScene2D;
 class CIcon : public CScene2D
 {
 public:
-	CIcon();				// コンストラクタ
+	CIcon();			// コンストラクタ
 	~CIcon();			// デストラクタ
 
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);				// 初期化処理
@@ -50,7 +48,6 @@ private:
 	D3DXVECTOR3 m_Pos;												// 座標
 	D3DXVECTOR3 m_move;												// 移動量
 	D3DXVECTOR3 m_size;												// サイズ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_ICON_TEXTURE];		// テクスチャ情報のポインタ
 	float m_fScale;													// 縮小用変数
 	float m_fScaleNum;												// 縮小量
 	int m_nFlashFlame;												// 点滅のフレーム

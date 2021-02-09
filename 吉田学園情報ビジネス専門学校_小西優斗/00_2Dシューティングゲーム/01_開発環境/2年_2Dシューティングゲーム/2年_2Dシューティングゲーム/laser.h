@@ -12,6 +12,7 @@
 //=============================================================================
 #include "scene2d.h"
 #include "flash.h"
+
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -19,7 +20,6 @@
 #define LASER_SIZE_Y			(10)		// サイズ
 #define LASER_ANIM_SPEED		(5)			// アニメーションの速さ
 #define LASER_ANIM_PATTERN		(8)			// アニメーションのパターン
-#define MAX_LASER_TEXTURE		(1)			// テクスチャ数
 #define MAX_FLASH_NUM			(64)		// 数
 #define LASER_FLAME				(30)		// レーザーのフレーム
 
@@ -56,8 +56,6 @@ public:
 		TYPE type, LASER_COLOR Ctype);
 
 	void SetInfo(D3DXVECTOR3 move, D3DXVECTOR3 size);				// レーザーの情報設定
-	static HRESULT Load(void);										// テクスチャロード
-	static void UnLoad(void);										// テクスチャアンロード
 	void SetColor(LASER_COLOR Ctype);								// 変数の代入
 	void InitColor(void);											// カラー設定
 	void LaserUpdate(void);											// レーザーの処理
@@ -71,7 +69,6 @@ private:
 	D3DXVECTOR3 m_move;											// 移動量
 	D3DXVECTOR3 m_Size;											// サイズ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;							// 頂点バッファのポインタ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_LASER_TEXTURE];	// テクスチャ情報のポインタ
 	LASER_COLOR m_Ctype;										// カラータイプ
 	bool m_bUse;												// レーザーを使っている
 	D3DXVECTOR3 m_PolygonPos;									// ポリゴンの座標

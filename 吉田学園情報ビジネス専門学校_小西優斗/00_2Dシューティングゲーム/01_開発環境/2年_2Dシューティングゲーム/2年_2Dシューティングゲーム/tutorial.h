@@ -1,9 +1,8 @@
 #ifndef _TUTORIAL_H_
 #define _TUTORIAL_H_
-
 //=============================================================================
 //
-// チュートリアルクラスヘッダー
+// チュートリアルクラスヘッダー [tutorial.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -16,7 +15,6 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define MAX_TUTORIAL_TEXTURE		(1)			// テクスチャの数
 #define TUTORIAL_SIZE_X			(300.0f)		// サイズ
 #define TUTORIAL_SIZE_Y			(400.0f)		// サイズ
 
@@ -41,13 +39,10 @@ public:
 
 	static CTutorial * Create(									// ポリゴンの生成
 		D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 
 private:
 	D3DXVECTOR3 m_Pos;												// 座標
 	D3DXVECTOR3 m_move;												// 移動量
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_TUTORIAL_TEXTURE];	// テクスチャ情報のポインタ
 };
 
 #endif

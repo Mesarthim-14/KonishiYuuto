@@ -14,6 +14,7 @@
 #include "number.h"
 #include "boss.h"
 #include "game.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -29,7 +30,7 @@ bool CTime::m_bRetire = false;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CTime::CTime()
+CTime::CTime(TYPE Priority): CScene(Priority)
 {
 	m_nTime = BOSS_TIME;
 	m_dwBossStartTime = GetBossCurrentTime();
@@ -53,6 +54,7 @@ HRESULT CTime::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	{
 		// 数字のメモリ確保
 		m_apNumber[nCount] = CNumber::Create(pos, size, type, CNumber::NUMBER_TYPE_RANKING);
+		m_apNumber[nCount]->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_NUMBER_001));
 
 		if (m_apNumber[nCount] != NULL)
 		{
@@ -79,6 +81,7 @@ void CTime::Uninit(void)
 			m_apNumber[nCount]->Uninit();
 		}
 	}
+
 	// メモリの開放処理
 	Release();
 }

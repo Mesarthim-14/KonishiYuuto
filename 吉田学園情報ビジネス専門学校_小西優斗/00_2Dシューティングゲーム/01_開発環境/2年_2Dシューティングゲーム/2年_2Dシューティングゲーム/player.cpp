@@ -28,33 +28,29 @@
 #include "bullet.h"
 #include "bomb_ui.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define PLAYER_LIFE				(1)			// プレイヤーの体力
-#define PLAYER_BULLET_SIZE_X	(30)		// プレイヤーの弾のサイズ(横)
-#define PLAYER_BULLET_SIZE_Y	(120)		// プレイヤーの弾のサイズ(縦)
-#define PLAYER_SPEED			(5.0f)	 	// プレイヤーの速度
-#define BULLET_INTERVAL			(5)			// 弾の連射間隔
-#define PLAYER_STOCK			(3)			// プレイヤーの残機
-#define PLAYER_ARMOR_COUNT		(240)		// 無敵時間
-#define PLAYER_BOMB_NUM			(1)			// ボムの数
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CPlayer::m_pTexture = NULL;
+#define PLAYER_LIFE					(1)			// プレイヤーの体力
+#define PLAYER_BULLET_SIZE_X		(30)		// プレイヤーの弾のサイズ(横)
+#define PLAYER_BULLET_SIZE_Y		(120)		// プレイヤーの弾のサイズ(縦)
+#define PLAYER_SPEED				(5.0f)	 	// プレイヤーの速度
+#define BULLET_INTERVAL				(5)			// 弾の連射間隔
+#define PLAYER_STOCK				(3)			// プレイヤーの残機
+#define PLAYER_ARMOR_COUNT			(240)		// 無敵時間
+#define PLAYER_BOMB_NUM				(1)			// ボムの数
+#define PLAYER_LASER_NUM			(10)		// レーザーに必要な値
+#define PLAYER_LASER_FLAME			(100)		// レーザーの終了フレーム
+#define PLAYER_RESURRECTION_FLAME	(50)		// 復活のフレーム
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CPlayer::CPlayer()
+CPlayer::CPlayer() : CCharacter(TYPE_PLAYER)
 {
-	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_BulletState = 0;
-	m_nLife = 0;
 	m_nStock = 0;
 	m_nLaserFlame = 0;
 	m_nLaserCounter = 0;
@@ -67,7 +63,6 @@ CPlayer::CPlayer()
 	m_nResurrectionCnt = 0;
 	m_bPlayerDraw = false;
 	m_bUseLaser = false;
-	m_State = PLAYER_STATE_NONE;
 	m_StateCount = 0;
 	m_nBombFlame = 0;
 	m_nBombNum = 0;
@@ -80,23 +75,6 @@ CPlayer::CPlayer()
 CPlayer::~CPlayer()
 {
 
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CPlayer::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/player001.png",
-		&m_pTexture);		// テクスチャへのポインタ
-
-	return S_OK;
 }
 
 //=============================================================================
@@ -128,17 +106,14 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
 	// 値の代入
 	m_BulletState = BULLET_INTERVAL;	// 弾の間隔初期化
-	m_nLife = PLAYER_LIFE;				// 体力
 	m_nLaserFlame = LASER_FLAME;		// レーザーのフレーム
-
-	// 情報を受け渡す
-	CScene2D::SetPolygon(pos, size);
+	SetLife(PLAYER_LIFE);				// 体力
 
 	// テクスチャ受け渡し
-	BindTexture(m_pTexture);
+	BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_PLAYER));
 
 	// ポリゴン初期化
-	CScene2D::Init(pos, size, type);
+	CCharacter::Init(pos, size, type);
 
 	// 初期シールドの生成
 	m_pShield = CShield::Create(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
@@ -161,25 +136,12 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 }
 
 //=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CPlayer::UnLoad(void)
-{
-	// テクスチャの開放
-	if (m_pTexture != NULL)
-	{
-		m_pTexture->Release();
-		m_pTexture = NULL;
-	}
-}
-
-//=============================================================================
 // 終了処理
 //=============================================================================
 void CPlayer::Uninit(void)
 {
 	// 終了処理
-	CScene2D::Uninit();
+	CCharacter::Uninit();
 }
 
 //=============================================================================
@@ -187,10 +149,8 @@ void CPlayer::Uninit(void)
 //=============================================================================
 void CPlayer::Update(void)
 {
-	m_Pos = GetPosition();
-
 	// 更新処理
-	CScene2D::Update();
+	CCharacter::Update();
 
 	// プレイヤーの状態
 	UpdateState();
@@ -200,74 +160,28 @@ void CPlayer::Update(void)
 		// プレイヤー制御関数
 		PlayerControl();
 
-		m_Pos += m_Move;
-
 		if (m_pShield != NULL)
 		{
+			D3DXVECTOR3 pos = GetPos();
+
 			// シールドに座標を渡す
-			m_bShildScaleInfo = m_pShield->ScaleUp(m_Pos);
+			m_bShildScaleInfo = m_pShield->ScaleUp(pos);
 		}
 	}
 
-	 // ボムの当たり判定
+	// ボムの当たり判定
 	if (m_bBombUse == true)
 	{
 		// ボムの当たり判定
-		if (BombCollision() == true)
-		{
-			CScene *pScene = NULL;
-			if (pScene == NULL)
-			{
-				// シーンを取得
-				pScene = CScene::GetScene(m_nBombNum);
-
-				// メモリのキャスト
-				CScene2D *pScene2D = (CScene2D*)pScene;
-
-				if (pScene2D != NULL)
-				{
-					switch (m_BombType)
-					{
-					case TYPE_ENEMY:
-					{
-						// 敵のサイズ取得
-						CEnemy *pEnemy = (CEnemy*)pScene2D;
-
-						// ライフをへらす
-						pEnemy->HitDamage(30);
-
-					}
-					break;
-
-					case TYPE_BULLET:
-					{
-						// 敵のサイズ取得
-						CBullet *pBullet = (CBullet*)pScene2D;
-
-						// ライフをへらす
-						pBullet->DecreaseLife(10000);
-					}
-					break;
-
-					}
-
-				}
-			}
-		}
+		BombCollision();
 	}
 
-	// 座標を渡す
-	SetPosition(m_Pos);
+	STATE state = GetState();
 
-	// 体力が無くなったら
-	if (m_nLife <= 0)
+	if (state == STATE_DAMAGE)
 	{
-		if (m_pShield != NULL)
-		{
-			// シールド消滅
-			m_pShield->Uninit();
-			m_pShield = NULL;
-		}
+		// 死ぬ処理
+		Death();
 	}
 
 	// 復活処理
@@ -297,14 +211,19 @@ void CPlayer::PlayerControl(void)
 	// ジョイパッドの取得
 	DIJOYSTATE js = CInputJoypad::GetStick(0);
 
+	D3DXVECTOR3 pos = GetPos();
+
 	if (js.lX != 0.0f || js.lY != 0)
 	{
 		float fAngle = atan2f((float)js.lX, (float)js.lY);
 
 		// ジョイパッド操作
-		m_Pos.x += sinf(fAngle)* PLAYER_SPEED;
-		m_Pos.y += cosf(fAngle)* PLAYER_SPEED;
+		pos.x += sinf(fAngle)* PLAYER_SPEED;
+		pos.y += cosf(fAngle)* PLAYER_SPEED;
 	}
+
+	// 座標を渡す
+	SetPosition(pos);
 
 	// キーボード更新
 	CKeyboard *pKeyboard = CManager::GetKeyboard();
@@ -312,22 +231,22 @@ void CPlayer::PlayerControl(void)
 	// Wキーを押したとき
 	if (pKeyboard->GetPress(DIK_W))
 	{
-		m_Pos.y += cosf(D3DX_PI)*PLAYER_SPEED;
+		pos.y += cosf(D3DX_PI)*PLAYER_SPEED;
 	}
 	// Sキーを押したとき
 	if (pKeyboard->GetPress(DIK_S))
 	{
-		m_Pos.y += cosf(0)*PLAYER_SPEED;
+		pos.y += cosf(0)*PLAYER_SPEED;
 	}
 	// Aキーを押したとき
 	if (pKeyboard->GetPress(DIK_A))
 	{
-		m_Pos.x -= sinf(D3DX_PI / 2)*PLAYER_SPEED;
+		pos.x -= sinf(D3DX_PI / 2)*PLAYER_SPEED;
 	}
 	// Dキーを押したとき
 	if (pKeyboard->GetPress(DIK_D))
 	{
-		m_Pos.x += sinf(D3DX_PI / 2)*PLAYER_SPEED;
+		pos.x += sinf(D3DX_PI / 2)*PLAYER_SPEED;
 	}
 
 	// シールド生成の処理
@@ -352,7 +271,7 @@ void CPlayer::PlayerControl(void)
 				}
 				m_bShildInfo = false;
 				// 黒いとき
-				m_pShield = CShield::Create(m_Pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				m_pShield = CShield::Create(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 					D3DXVECTOR3(SHIELD_SIZE_X, SHIELD_SIZE_Y, 0.0f),
 					TYPE_SHIELD, CShield::SHIELD_TYPE_BLACK);
 			}
@@ -367,7 +286,7 @@ void CPlayer::PlayerControl(void)
 				}
 				m_bShildInfo = true;
 				// 白いとき
-				m_pShield = CShield::Create(m_Pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				m_pShield = CShield::Create(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 					D3DXVECTOR3(SHIELD_SIZE_X, SHIELD_SIZE_Y, 0.0f),
 					TYPE_SHIELD, CShield::SHIELD_TYPE_WHITE);
 			}
@@ -390,14 +309,14 @@ void CPlayer::PlayerControl(void)
 				if (m_bShildInfo == true)
 				{
 					// 弾の生成
-					CBullet::Create(D3DXVECTOR3(m_Pos.x + PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y, 0.0f),
+					CBullet::Create(D3DXVECTOR3(pos.x + PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y, 0.0f),
 						D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 						D3DXVECTOR3(PLAYER_BULLET_SIZE_X, PLAYER_BULLET_SIZE_Y, 0.0f),
 						TYPE_BULLET, CBullet::BULLET_TYPE_PLAYER, CBullet::BULLET_COLOR_WHITE,
 						100);
 
 					// 弾の生成
-					CBullet::Create(D3DXVECTOR3(m_Pos.x - PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y, 0.0f),
+					CBullet::Create(D3DXVECTOR3(pos.x - PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y, 0.0f),
 						D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 						D3DXVECTOR3(PLAYER_BULLET_SIZE_X, PLAYER_BULLET_SIZE_Y, 0.0f),
 						TYPE_BULLET, CBullet::BULLET_TYPE_PLAYER, CBullet::BULLET_COLOR_WHITE,
@@ -406,11 +325,11 @@ void CPlayer::PlayerControl(void)
 					// マズルフラッシュの生成
 					for (int nCount = 0; nCount < MUZZLE_FLASH_NUM; nCount++)
 					{
-						CMuzzleFlash::Create(D3DXVECTOR3(m_Pos.x + PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
+						CMuzzleFlash::Create(D3DXVECTOR3(pos.x + PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
 							D3DXVECTOR3(MUZZLE_FLASH_SIZE_X, MUZZLE_FLASH_SIZE_Y, 0.0f),
 							TYPE_EFFECT, CMuzzleFlash::MUZZLE_FLASH_COLOR_WHITE, MUZZLE_FLASH_LIFE);
 
-						CMuzzleFlash::Create(D3DXVECTOR3(m_Pos.x - PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
+						CMuzzleFlash::Create(D3DXVECTOR3(pos.x - PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
 							D3DXVECTOR3(MUZZLE_FLASH_SIZE_X, MUZZLE_FLASH_SIZE_Y, 0.0f),
 							TYPE_EFFECT, CMuzzleFlash::MUZZLE_FLASH_COLOR_WHITE, MUZZLE_FLASH_LIFE);
 					}
@@ -418,13 +337,13 @@ void CPlayer::PlayerControl(void)
 				else
 				{
 					// 弾の生成
-					CBullet::Create(D3DXVECTOR3(m_Pos.x + PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y , 0.0f),
+					CBullet::Create(D3DXVECTOR3(pos.x + PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y , 0.0f),
 						D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 						D3DXVECTOR3(PLAYER_BULLET_SIZE_X, PLAYER_BULLET_SIZE_Y, 0.0f),
 						TYPE_BULLET, CBullet::BULLET_TYPE_PLAYER, CBullet::BULLET_COLOR_BLACK,
 						100);
 					// 弾の生成
-					CBullet::Create(D3DXVECTOR3(m_Pos.x - PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y, 0.0f),
+					CBullet::Create(D3DXVECTOR3(pos.x - PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y, 0.0f),
 						D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 						D3DXVECTOR3(PLAYER_BULLET_SIZE_X, PLAYER_BULLET_SIZE_Y, 0.0f),
 						TYPE_BULLET, CBullet::BULLET_TYPE_PLAYER, CBullet::BULLET_COLOR_BLACK,
@@ -433,11 +352,11 @@ void CPlayer::PlayerControl(void)
 					// マズルフラッシュの生成
 					for (int nCount = 0; nCount < MUZZLE_FLASH_NUM; nCount++)
 					{
-						CMuzzleFlash::Create(D3DXVECTOR3(m_Pos.x + PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
+						CMuzzleFlash::Create(D3DXVECTOR3(pos.x + PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
 							D3DXVECTOR3(MUZZLE_FLASH_SIZE_X, MUZZLE_FLASH_SIZE_Y, 0.0f),
 							TYPE_EFFECT, CMuzzleFlash::MUZZLE_FLASH_COLOR_BLACK, MUZZLE_FLASH_LIFE);
 
-						CMuzzleFlash::Create(D3DXVECTOR3(m_Pos.x - PLAYER_SHOT_POS_X, m_Pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
+						CMuzzleFlash::Create(D3DXVECTOR3(pos.x - PLAYER_SHOT_POS_X, pos.y - PLAYER_SHOT_POS_Y + 10, 0.0f),
 							D3DXVECTOR3(MUZZLE_FLASH_SIZE_X, MUZZLE_FLASH_SIZE_Y, 0.0f),
 							TYPE_EFFECT, CMuzzleFlash::MUZZLE_FLASH_COLOR_BLACK, MUZZLE_FLASH_LIFE);
 					}
@@ -455,7 +374,7 @@ void CPlayer::PlayerControl(void)
 	}
 
 	// Lキーが押されたら
-	if (pKeyboard->GetTrigger(DIK_L) && m_pGage->GetLaserNum() >= 10 || CManager::GetJoypad()->GetJoystickTrigger(7, 0))
+	if (pKeyboard->GetTrigger(DIK_L) && m_pGage->GetLaserNum() >= PLAYER_LASER_NUM || CManager::GetJoypad()->GetJoystickTrigger(7, 0))
 	{
 			if (m_bShildScaleInfo == true)
 			{
@@ -464,7 +383,7 @@ void CPlayer::PlayerControl(void)
 					// トリガー
 					if (m_bUseLaser == true)
 					{
-						if (m_nLaserCounter >= 100)
+						if (m_nLaserCounter >= PLAYER_LASER_FLAME)
 						{
 							m_bUseLaser = false;
 							m_nLaserCounter = 0;
@@ -472,12 +391,12 @@ void CPlayer::PlayerControl(void)
 					}
 					else
 					{
-						if (m_nLaserCounter >= 100)
+						if (m_nLaserCounter >= PLAYER_LASER_FLAME)
 						{
 							if (m_pLaser == NULL)
 							{
 								// 弾の生成
-								m_pLaser = CLaser::Create(D3DXVECTOR3(m_Pos.x + 0.0f, m_Pos.y + 5.0f, 0.0f),
+								m_pLaser = CLaser::Create(D3DXVECTOR3(pos.x + 0.0f, pos.y + 5.0f, 0.0f),
 									D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 									D3DXVECTOR3(LASER_SIZE_X, LASER_SIZE_Y, 0.0f),
 									TYPE_LASER, CLaser::LASER_COLOR_WHITE);
@@ -499,7 +418,7 @@ void CPlayer::PlayerControl(void)
 					// トリガー
 					if (m_bUseLaser == true)
 					{
-						if (m_nLaserCounter >= 100)
+						if (m_nLaserCounter >= PLAYER_LASER_FLAME)
 						{
 							m_bUseLaser = false;
 							m_nLaserCounter = 0;
@@ -507,12 +426,12 @@ void CPlayer::PlayerControl(void)
 					}
 					else
 					{
-						if (m_nLaserCounter >= 100)
+						if (m_nLaserCounter >= PLAYER_LASER_FLAME)
 						{
 							if (m_pLaser == NULL)
 							{	
 								// レーザーの生成
-								m_pLaser = CLaser::Create(D3DXVECTOR3(m_Pos.x + 0.0f, m_Pos.y + 15.0f, 0.0f),
+								m_pLaser = CLaser::Create(D3DXVECTOR3(pos.x + 0.0f, pos.y + 15.0f, 0.0f),
 									D3DXVECTOR3(0.0f, -15.0f, 0.0f),
 									D3DXVECTOR3(LASER_SIZE_X, LASER_SIZE_Y, 0.0f),
 									TYPE_LASER, CLaser::LASER_COLOR_BLACK);
@@ -552,12 +471,12 @@ void CPlayer::PlayerControl(void)
 			// ボムの衝撃波生成
 			for (int nCount = 0; nCount < BOMB_NUM; nCount++)
 			{
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SIZE_X, BOMB_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SHOCK, CBomb::BOMB_COLOR_WHITE,
 					nCount* (BOMB_ANGLE / BOMB_NUM), 180, BOMB_DISTANCE, BOMB_LIFE);
 
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SIZE_X, BOMB_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SHOCK, CBomb::BOMB_COLOR_WHITE,
 					nCount* (BOMB_ANGLE / BOMB_NUM), 180, BOMB_DISTANCE, BOMB_LIFE);
@@ -566,12 +485,12 @@ void CPlayer::PlayerControl(void)
 			// ボムの火花生成
 			for (int nCount = 1; nCount < BOMB_SPARK_NUM + 1; nCount++)
 			{
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SPARK_SIZE_X, BOMB_SPARK_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SPARK, CBomb::BOMB_COLOR_WHITE,
 					nCount * (BOMB_SPARK_ANGLE / BOMB_SPARK_NUM), 90, BOMB_SPARK_DISTANCE, BOMB_SPARK_LIFE);
 
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SPARK_SIZE_X, BOMB_SPARK_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SPARK, CBomb::BOMB_COLOR_WHITE,
 					nCount * (BOMB_SPARK_ANGLE / BOMB_SPARK_NUM), 90, BOMB_SPARK_DISTANCE, BOMB_SPARK_LIFE);
@@ -582,12 +501,12 @@ void CPlayer::PlayerControl(void)
 			// ボムの衝撃波生成
 			for (int nCount = 0; nCount < BOMB_NUM; nCount++)
 			{
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SIZE_X, BOMB_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SHOCK, CBomb::BOMB_COLOR_BLACK,
 					nCount* (BOMB_ANGLE / BOMB_NUM), 180, BOMB_DISTANCE, BOMB_LIFE);
 
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SIZE_X, BOMB_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SHOCK, CBomb::BOMB_COLOR_BLACK,
 					nCount* (BOMB_ANGLE / BOMB_NUM), 180, BOMB_DISTANCE, BOMB_LIFE);
@@ -596,12 +515,12 @@ void CPlayer::PlayerControl(void)
 			// ボムの火花生成
 			for (int nCount = 1; nCount < BOMB_SPARK_NUM + 1; nCount++)
 			{
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SPARK_SIZE_X, BOMB_SPARK_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SPARK, CBomb::BOMB_COLOR_BLACK,
 					nCount * (BOMB_SPARK_ANGLE / BOMB_SPARK_NUM), 90, BOMB_SPARK_DISTANCE, BOMB_SPARK_LIFE);
 
-				CBomb::Create(m_Pos,
+				CBomb::Create(pos,
 					D3DXVECTOR3(BOMB_SPARK_SIZE_X, BOMB_SPARK_SIZE_Y, 0.0f),
 					TYPE_EFFECT, CBomb::BOMB_TYPE_SPARK, CBomb::BOMB_COLOR_BLACK,
 					nCount * (BOMB_SPARK_ANGLE / BOMB_SPARK_NUM), 90, BOMB_SPARK_DISTANCE, BOMB_SPARK_LIFE);
@@ -618,12 +537,12 @@ void CPlayer::PlayerControl(void)
 		if (m_nLaserFlame >= LASER_FLAME)
 		{
 			// ゲージの減算
-			m_pGage->SubtractGame(10);
+			m_pGage->SubtractGame(PLAYER_LASER_NUM);
 			m_nLaserFlame = 0;
 		}
 
 		// ゲージが一定量以下だったら
-		if (m_pGage->GetLaserNum() <= 10)
+		if (m_pGage->GetLaserNum() <= PLAYER_LASER_NUM)
 		{
 			m_bUseLaser = false;
 		}
@@ -655,25 +574,29 @@ void CPlayer::PlayerControl(void)
 	}
 
 	// 左判定
-	if (m_Pos.x - PLAYER_SIZE_X / 2 < WALL_SIZE_X)
+	if (pos.x - PLAYER_SIZE_X / 2 < WALL_SIZE_X)
 	{
-		m_Pos.x = WALL_SIZE_X + PLAYER_SIZE_X / 2;
+		pos.x = WALL_SIZE_X + PLAYER_SIZE_X / 2;
 	}
 	// 右判定
-	if (m_Pos.x + PLAYER_SIZE_X / 2 > SCREEN_WIDTH - WALL_SIZE_X)
+	if (pos.x + PLAYER_SIZE_X / 2 > SCREEN_WIDTH - WALL_SIZE_X)
 	{
-		m_Pos.x =  SCREEN_WIDTH - WALL_SIZE_X - PLAYER_SIZE_X / 2;
+		pos.x =  SCREEN_WIDTH - WALL_SIZE_X - PLAYER_SIZE_X / 2;
 	}
 	// 上判定
-	if (m_Pos.y - PLAYER_SIZE_Y / 2 < 0.0f)
+	if (pos.y - PLAYER_SIZE_Y / 2 < 0.0f)
 	{
-		m_Pos.y = PLAYER_SIZE_Y / 2;
+		pos.y = PLAYER_SIZE_Y / 2;
 	}
 	// 下判定
-	if (m_Pos.y + PLAYER_SIZE_Y / 2 > SCREEN_HEIGHT)
+	if (pos.y + PLAYER_SIZE_Y / 2 > SCREEN_HEIGHT)
 	{
-		m_Pos.y = SCREEN_HEIGHT - PLAYER_SIZE_Y / 2;
+		pos.y = SCREEN_HEIGHT - PLAYER_SIZE_Y / 2;
 	}
+
+	// 座標を渡す
+	SetPosition(pos);
+
 }
 
 //=============================================================================
@@ -688,7 +611,8 @@ void CPlayer::Resurrection(void)
 	{
 		// 復活しました
 		m_bPlayerDraw = true;
-		m_State = PLAYER_STATE_REVIVE;
+
+		SetState(STATE_REVIVE);
 		m_nBombCount = PLAYER_BOMB_NUM;
 
 		if (m_pBombUi == NULL)
@@ -706,7 +630,7 @@ void CPlayer::Resurrection(void)
 		}
 	}
 
-	if (m_nResurrectionCnt >= 50)
+	if (m_nResurrectionCnt >= PLAYER_RESURRECTION_FLAME)
 	{
 		// 残機のカウントを上げる
 		m_nStock++;
@@ -719,6 +643,11 @@ void CPlayer::Resurrection(void)
 
 			// フェード処理
 			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+
+			// 音の処理
+			CSound *pSound = NULL;
+			pSound = CManager::GetSound();
+			pSound->Stop(CSound::SOUND_LABEL_GAME);
 			return;
 		}
 
@@ -733,14 +662,13 @@ void CPlayer::Resurrection(void)
 		}
 
 		// ライフと座標を戻す
-		m_nLife = PLAYER_LIFE;
-		m_Pos = D3DXVECTOR3(SCREEN_WIDTH / 2, 700.0f, 0.0f);
+		SetLife(PLAYER_LIFE);
+		SetPosition(D3DXVECTOR3(SCREEN_WIDTH / 2, 700.0f, 0.0f));
 
-		// Scene2Dにposを渡す
-		SetPosition(m_Pos);
+		D3DXVECTOR3 pos = GetPos();
 
 		// シールド生成
-		m_pShield = CShield::Create(m_Pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		m_pShield = CShield::Create(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 			D3DXVECTOR3(SHIELD_SIZE_X, SHIELD_SIZE_Y, 0.0f),
 			TYPE_SHIELD, CShield::SHIELD_TYPE_WHITE);
 
@@ -766,10 +694,13 @@ void CPlayer::UpdateState(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	switch (m_State)
+	// 状態の情報取得
+	STATE state = GetState();
+
+	switch (state)
 	{
 		// 通常状態
-	case PLAYER_STATE_NORMAL:
+	case STATE_NORMAL:
 		// 頂点カラーの設定
 		pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);	// 左上頂点の色	透明度255
 		pVtx[1].col = D3DCOLOR_RGBA(255, 255, 255, 255);	// 右上頂点の色	透明度255
@@ -778,10 +709,11 @@ void CPlayer::UpdateState(void)
 		break;
 
 		// 蘇生時
-	case PLAYER_STATE_REVIVE:
+	case STATE_REVIVE:
 		// 復活
 		m_StateCount++;
 
+		
 		if (m_StateCount % 2 == 0)
 		{
 			// 頂点カラーの設定
@@ -802,53 +734,16 @@ void CPlayer::UpdateState(void)
 		if (m_StateCount >= PLAYER_ARMOR_COUNT)
 		{
 			// 通常状態に戻す
-			m_State = PLAYER_STATE_NORMAL;
+			SetState(STATE_NORMAL);
 			m_StateCount = 0;
 		}
 		break;
-	case PLAYER_STATE_LASER:
+	case STATE_LASER:
 		break;
 	}
 
 	// 頂点バッファをアンロックする
 	pVtxBuff->Unlock();
-}
-
-//=============================================================================
-// ダメージを受けたとき
-//=============================================================================
-void CPlayer::HitDamage(int nCount)
-{
-	if (m_State != PLAYER_STATE_REVIVE)
-	{
-		// ライフ減算
-		m_nLife -= nCount;
-
-		if (m_nLife <= 0)
-		{
-			CSound *pSound = NULL;
-			pSound = CManager::GetSound();
-			pSound->Play(CSound::SOUND_LABEL_BOMB);
-
-			if (m_bShildInfo == true)
-			{
-				// 爆発生成
-				CExplosion::Create(
-					m_Pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(EXPLOSION_SIZE_X, EXPLOSION_SIZE_Y, 0.0f),
-					TYPE_EXPLOSION, CExplosion::COLOR_TYPE_WHITE);
-			}
-			else
-			{
-				// 爆発生成
-				CExplosion::Create(
-					m_Pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(EXPLOSION_SIZE_X, EXPLOSION_SIZE_Y, 0.0f),
-					TYPE_EXPLOSION, CExplosion::COLOR_TYPE_BLACK);
-			}
-
-			// 復活の処理
-			Resurrection();
-		}
-	}
 }
 
 //=============================================================================
@@ -858,82 +753,154 @@ bool CPlayer::BombCollision(void)
 {
 	m_nBombFlame++;
 
-	for (int nCount = 0; nCount < MAX_OBJECT; nCount++)
+	CScene *pScene = NULL;
+
+	if (pScene == NULL)
 	{
-		CScene *pScene = NULL;
-		if (pScene == NULL)
+		// シーンを取得
+		pScene = CScene::GetTop(TYPE_ENEMY);
+
+		while (pScene)
 		{
-			// シーンを取得
-			pScene = CScene::GetScene(nCount);
+			CScene *pSceneNext = pScene->GetNext();
+
+			TYPE type = pScene->GetType();
 
 			// メモリのキャスト
 			CScene2D *pScene2D = (CScene2D*)pScene;
 
 			if (pScene2D != NULL)
 			{
-				CScene::TYPE type = pScene->GetType();
+				// ターゲットの情報確保
+				D3DXVECTOR3 Target = pScene2D->GetPos();
 
-				// エネミーの時
-				if (type == TYPE_ENEMY)
+				// 敵のサイズ取得
+				CEnemy *pEnemy = (CEnemy*)pScene2D;
+				D3DXVECTOR3 size = pEnemy->GetSize();
+
+				// 自分の座標
+				D3DXVECTOR3 pos = GetPos();
+
+				for (int nCntAngle = 0; nCntAngle < 360; nCntAngle++)
 				{
-					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
-
-					// 敵のサイズ取得
-					CEnemy *pEnemy = (CEnemy*)pScene2D;
-					D3DXVECTOR3 size = pEnemy->GetSize();
-
-					for (int nCntAngle = 0; nCntAngle < 360; nCntAngle++)
+					// 自分と相手の当たり判定
+					if (Target.x - size.x / 2 >= pos.x + 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+						Target.x + size.x / 2 <= pos.x - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+						Target.y + size.y / 2 <= pos.y - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+						Target.y - size.y / 2 >= pos.y + 350.0f * cosf(D3DXToRadian(nCntAngle)))
 					{
-						// 自分と相手の当たり判定
-						if (Target.x - size.x / 2 >= m_Pos.x + 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.x + size.x / 2 <= m_Pos.x - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.y + size.y / 2 <= m_Pos.y - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.y - size.y / 2 >= m_Pos.y + 350.0f * cosf(D3DXToRadian(nCntAngle)))
-						{
-							m_BombType = type;
-
-							// エネミーの番号保管
-							m_nBombNum = nCount;
-							return true;
-						}
+						// ライフをへらす
+						pEnemy->HitDamage(30);
+						return true;
 					}
-				}
-				else if(type == TYPE_BULLET)
-				{
-					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
 
-					// 敵のサイズ取得
-					CBullet *pBullet = (CBullet*)pScene2D;
-					D3DXVECTOR3 size = pBullet->GetSize();
-					for (int nCntAngle = 0; nCntAngle < 360; nCntAngle++)
-					{
-						// 自分と相手の当たり判定
-						if (Target.x - size.x / 2 >= m_Pos.x + 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.x + size.x / 2 <= m_Pos.x - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.y + size.y / 2 <= m_Pos.y - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
-							Target.y - size.y / 2 >= m_Pos.y + 350.0f * cosf(D3DXToRadian(nCntAngle)))
-						{
-
-							pBullet->DecreaseLife(10000);
-							m_BombType = type;
-
-							// エネミーの番号保管
-							m_nBombNum = nCount;
-						}
-					}
 				}
 			}
+			pScene = pSceneNext;
 		}
+
+		// シーンを取得
+		pScene = CScene::GetTop(TYPE_BULLET);
+
+		while (pScene)
+		{
+
+			CScene *pSceneNext = pScene->GetNext();
+
+			// メモリのキャスト
+			CScene2D *pScene2D = (CScene2D*)pScene;
+
+			// ターゲットの情報確保
+			D3DXVECTOR3 Target = pScene2D->GetPos();
+
+			// 敵のサイズ取得
+			CBullet *pBullet = (CBullet*)pScene2D;
+			D3DXVECTOR3 size = pBullet->GetSize();
+			
+			// 自分の座標
+			D3DXVECTOR3 pos = GetPos();
+
+			for (int nCntAngle = 0; nCntAngle < 360; nCntAngle++)
+			{
+				// 自分と相手の当たり判定
+				if (Target.x - size.x / 2 >= pos.x + 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+					Target.x + size.x / 2 <= pos.x - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+					Target.y + size.y / 2 <= pos.y - 350.0f * cosf(D3DXToRadian(nCntAngle)) &&
+					Target.y - size.y / 2 >= pos.y + 350.0f * cosf(D3DXToRadian(nCntAngle)))
+				{
+
+					pBullet->DecreaseLife(10000);
+		//			return true;
+
+				}
+			}
+			pScene = pSceneNext;
+		}
+
 	}
 
-	if (m_nBombFlame >= 2)
+
+	if (m_nBombFlame >= 1)
 	{
 		m_bBombUse = false;
+		m_nBombFlame = 0;
 	}
 
 	return false;
+}
+
+//=============================================================================
+// 死んだときの関数
+//=============================================================================
+void CPlayer::Death(void)
+{
+	// 状態の情報取得
+	STATE state = GetState();
+
+	if (state == STATE_DAMAGE)
+	{
+		int nLife = GetLife();
+
+		if (nLife <= 0)
+		{
+			CSound *pSound = NULL;
+			pSound = CManager::GetSound();
+			pSound->Play(CSound::SOUND_LABEL_BOMB);
+			D3DXVECTOR3 pos = GetPos();
+
+			if (m_bShildInfo == true)
+			{
+				// 爆発生成
+				CExplosion::Create(
+					pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(EXPLOSION_SIZE_X, EXPLOSION_SIZE_Y, 0.0f),
+					TYPE_EXPLOSION, CExplosion::COLOR_TYPE_WHITE);
+			}
+			else
+			{
+				// 爆発生成
+				CExplosion::Create(
+					pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(EXPLOSION_SIZE_X, EXPLOSION_SIZE_Y, 0.0f),
+					TYPE_EXPLOSION, CExplosion::COLOR_TYPE_BLACK);
+			}
+
+			// 体力が無くなったら
+			if (nLife <= 0)
+			{
+				if (m_pShield != NULL)
+				{
+					// シールド消滅
+					m_pShield->Uninit();
+					m_pShield = NULL;
+				}
+			}
+
+			SetLife(10000);
+
+			// 復活の処理
+			Resurrection();
+		}
+	}
+
 }
 
 //=============================================================================

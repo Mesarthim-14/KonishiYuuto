@@ -1,9 +1,8 @@
 #ifndef _MESSAGE_H_
 #define _MESSAGE_H_
-
 //=============================================================================
 //
-// メッセージヘッダー	[message.h]
+// メッセージクラスヘッダー	[message.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -18,7 +17,6 @@
 //=============================================================================
 #define MESSAGE_SIZE_X			(50.0f)		// サイズ
 #define MESSAGE_SIZE_Y			(50.0f)		// サイズ
-#define MAX_MESSAGE_TEXTURE		(1)			// テクスチャ数
 
 //=============================================================================
 // 前方宣言
@@ -40,8 +38,6 @@ public:
 	void Draw(void);														// 描画処理
 
 	static CMessage * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);	// ポリゴン生成
-	static HRESULT Load(void);												// テクスチャロード
-	static void UnLoad(void);												// テクスチャアンロード
 
 	void ScaleUp(void);														// 拡大の処理
 	void ScaleDown(void);													// 縮小の処理
@@ -50,7 +46,6 @@ private:
 	D3DXVECTOR3 m_Pos;												// 座標
 	D3DXVECTOR3 m_move;												// 移動量
 	D3DXVECTOR3 m_size;												// サイズ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_MESSAGE_TEXTURE];		// テクスチャ情報のポインタ
 	float m_fScale;													// 縮小用変数
 	float m_fScaleNum;												// 縮小量
 	int m_nMessageCounter;											// メッセージの時間

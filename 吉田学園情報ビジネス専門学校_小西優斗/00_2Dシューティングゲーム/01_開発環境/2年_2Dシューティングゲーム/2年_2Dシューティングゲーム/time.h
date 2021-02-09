@@ -15,9 +15,9 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define MAX_TIME		(4)			// 桁数
-#define TIME_SIZE_X	(15.0f)			// スコアの縦のサイズ
-#define TIME_SIZE_Y	(30.0f)			// スコアの横のサイズ
+#define MAX_TIME		(4)		// 桁数
+#define TIME_SIZE_X	(15.0f)		// スコアの縦のサイズ
+#define TIME_SIZE_Y	(30.0f)		// スコアの横のサイズ
 
 //=============================================================================
 // 前置宣言
@@ -30,16 +30,15 @@ class CNumber;
 class CTime : public CScene
 {
 public:
-	CTime();				// コンストラクタ
-	~CTime();			// デストラクタ
+	CTime(TYPE Priority = TYPE_SCORE);	// コンストラクタ
+	~CTime();							// デストラクタ
 
-						// メンバ関数
+	// メンバ関数
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);	// 初期化処理
 	void Uninit(void);											// 終了処理
 	void Update(void);											// 更新処理
 	void Draw(void);											// 描画処理
 
-	void SetTime(int nTime);
 	int GetTime(void);
 	static bool GetRetire(void);								// ボスの撤退情報
 

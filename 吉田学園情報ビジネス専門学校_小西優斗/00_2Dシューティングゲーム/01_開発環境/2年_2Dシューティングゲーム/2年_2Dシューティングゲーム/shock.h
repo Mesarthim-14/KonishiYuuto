@@ -20,7 +20,6 @@
 #define SHOCK_SIZE_Y		(70)		// 衝撃の縦幅
 #define SHOCK_ANIM_SPEED	(5)			// 衝撃の速さ
 #define SHOCK_ANIM_PATTERN	(8)			// 衝撃テクスチャのパターン数
-#define MAX_SHOCK_TEXTURE	(2)			// テクスチャの最大数
 
 //=============================================================================
 // 前方宣言
@@ -53,20 +52,17 @@ public:
 		D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, COLOR_TYPE Ctype);
 
 	void SetShock(COLOR_TYPE Ctype);									// 移動量設定
-	static HRESULT Load(void);											// テクスチャロード
-	static void UnLoad(void);											// テクスチャアンロード
 	void SizeUp(void);													// サイズアップ
 	void UpdateInvisible(void);											// 透明になる処理
 private:
-	D3DXVECTOR3 m_Pos;											// 座標
-	D3DXVECTOR3 m_move;											// 移動
-	D3DXVECTOR3 m_size;											// サイズ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_SHOCK_TEXTURE];	// テクスチャ情報のポインタ
+	D3DXVECTOR3 m_Pos;			// 座標
+	D3DXVECTOR3 m_move;			// 移動
+	D3DXVECTOR3 m_size;			// サイズ
 	COLOR_TYPE m_Ctype;
-	float m_fScaleNumber;										// スケールの拡大量
-	float m_fScaleNum;											// スケールの拡大量
-	int m_nSubAlpha;											// 透明度の減算用
-	int m_nSubAlphaNum;											// 透明度減算値
+	float m_fScaleNumber;		// スケールの拡大量
+	float m_fScaleNum;			// スケールの拡大量
+	int m_nSubAlpha;			// 透明度の減算用
+	int m_nSubAlphaNum;			// 透明度減算値
 };
 
 #endif

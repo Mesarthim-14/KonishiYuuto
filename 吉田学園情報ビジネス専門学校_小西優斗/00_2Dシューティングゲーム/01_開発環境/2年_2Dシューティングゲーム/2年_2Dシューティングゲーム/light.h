@@ -1,6 +1,5 @@
 #ifndef _LIGHT_H_
 #define _LIGHT_H_
-
 //=============================================================================
 //
 // ライトクラスヘッダー		[light.h]
@@ -20,7 +19,6 @@
 #define LIGHT_SIZE_Y			(80)		// サイズ
 #define LIGHT_ANIM_SPEED		(5)			// アニメーションのスピード
 #define LIGHT_ANIM_PATTERN		(8)			// アニメーションのパターン
-#define MAX_LIGHT_TEXTURE		(1)			// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -53,15 +51,12 @@ public:
 		D3DXVECTOR3 size, TYPE type, LIGHT_TYPE Ltype);
 
 	void SetMove(D3DXVECTOR3 move);								// 移動量設定
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 	void SetColor(LIGHT_TYPE Ctype);							// カラーの設定
 	void InitColor(void);										// カラーの初期化
 
 private:
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_move;											// 移動量
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_LIGHT_TEXTURE];	// テクスチャ情報のポインタ
 	LIGHT_TYPE m_Ltype;											// ライトの種類
 	bool m_bScaleUp;											// 拡大終わりフラグ
 };

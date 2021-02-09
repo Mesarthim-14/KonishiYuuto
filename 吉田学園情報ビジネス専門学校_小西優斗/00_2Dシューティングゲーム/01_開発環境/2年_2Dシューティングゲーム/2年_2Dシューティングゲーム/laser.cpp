@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// レーザー処理 [laser.cpp]
+// レーザークラス [laser.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -21,16 +21,12 @@
 #include "bullet.h"
 #include "game.h"
 #include "muzzle_flash.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define LASER_DAMAGE		(2)		// ダメージ
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CLaser::m_apTexture[MAX_LASER_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -49,49 +45,16 @@ CLaser * CLaser::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move,
 		pLaser->SetColor(Ctype);				// 色の設定
 		pLaser->InitColor();					// 色の初期化
 		pLaser->InitScroll(2, -0.03f);			// スクロール情報設定
-		pLaser->BindTexture(m_apTexture[0]);	// テクスチャ設定
+		pLaser->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_LASER));	// テクスチャ設定
 	}
 
 	return pLaser;
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CLaser::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Laser000.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CLaser::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_LASER_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CLaser::CLaser()
+CLaser::CLaser() : CScene2D(TYPE_LASER)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -181,7 +144,7 @@ void CLaser::Update(void)
 	CScene2D::Update();
 
 	// 現在の位置を取得
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	// レーザーを動かす処理
 	LaserUpdate();
@@ -193,7 +156,7 @@ void CLaser::Update(void)
 	Collision();
 
 	// Scene2Dに座標を渡す
-	SetP(m_Pos);
+	SetPos(m_Pos);
 
 
 	// レーザーの情報を受け取る
@@ -247,7 +210,7 @@ void CLaser::LaserUpdate(void)
 
 	// プレイヤーの情報取得
 	CPlayer *pPlayer = CGame::GetPlayer();
-	D3DXVECTOR3 ShotPos = D3DXVECTOR3(pPlayer->GetPosition().x, pPlayer->GetPosition().y - 50.0f, 0.0f);
+	D3DXVECTOR3 ShotPos = D3DXVECTOR3(pPlayer->GetPos().x, pPlayer->GetPos().y - 50.0f, 0.0f);
 
 	// 頂点情報を設定
 	VERTEX_2D *pVtx;
@@ -305,79 +268,86 @@ void CLaser::DisappearLaser(void)
 	pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
-	for (int nCount = 0; nCount < MAX_POLYGON; nCount++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
 	{
 		CScene *pScene = NULL;
 
 		if (pScene == NULL)
 		{
-			// メモリ確保
-			pScene = CScene::GetScene(nCount);
+			// シーンを取得
+			pScene = CScene::GetTop(nCount);
 
-			// メモリのキャスト
-			CScene2D *pScene2D = (CScene2D*)pScene;
-
-			if (pScene2D != NULL)
+			while (pScene)
 			{
-				// ターゲットの情報確保
-				CScene::TYPE type = pScene->GetType();
+				CScene *pSceneNext = pScene->GetNext();
 
-				if (type == TYPE_PLAYER)
+				TYPE type = pScene->GetType();
+
+				CScene2D *pScene2D = (CScene2D*)pScene;
+
+				if (pScene2D != NULL)
 				{
-					D3DXVECTOR3 ShotPos = pScene2D->GetPosition();
+					// ターゲットの情報確保
+					CScene::TYPE type = pScene->GetType();
 
-					// 頂点情報を設定
-					VERTEX_2D *pVtx;
-
-					LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-
-					// 頂点バッファをロックし、頂点情報へのポインタを取得
-					pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-					if (0.0f <= pVtx[0].pos.y)
+					if (type == TYPE_PLAYER)
 					{
-						m_Pos += m_move;
-					}
+						D3DXVECTOR3 ShotPos = pScene2D->GetPos();
 
-					// サイズを小さくする
-					m_Size.x -= 2.5f;
+						// 頂点情報を設定
+						VERTEX_2D *pVtx;
 
-					// 頂点座標の設定
-					pVtx[0].pos = D3DXVECTOR3((ShotPos.x - m_Size.x / 2), m_Pos.y, 0.0f);
-					pVtx[1].pos = D3DXVECTOR3((ShotPos.x + m_Size.x / 2), m_Pos.y, 0.0f);
-					pVtx[2].pos = D3DXVECTOR3((ShotPos.x - m_Size.x / 2), ShotPos.y, 0.0f);
-					pVtx[3].pos = D3DXVECTOR3((ShotPos.x + m_Size.x / 2), ShotPos.y, 0.0f);
+						LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
-					// ポリゴンの座標
-					m_PolygonPos = D3DXVECTOR3((pVtx[0].pos.x + pVtx[1].pos.x) / 2, (pVtx[0].pos.y + pVtx[2].pos.y) / 2, 0.0f);
-					m_PolygonSize = D3DXVECTOR3(m_Size.x, (ShotPos.y - pVtx[0].pos.y) / 2, 0.0f);
+						// 頂点バッファをロックし、頂点情報へのポインタを取得
+						pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-					// 先端の座標
-					if (pVtx[0].pos.y <= ShotPos.y)
-					{
-						m_PolygonTop = D3DXVECTOR3(m_PolygonPos.x, pVtx[0].pos.y + 50.0f, 0.0f);
-					}
-					else
-					{
-						m_PolygonTop = D3DXVECTOR3(ShotPos.x, ShotPos.y + 50.0f, 0.0f);
+						if (0.0f <= pVtx[0].pos.y)
+						{
+							m_Pos += m_move;
+						}
 
-					}
+						// サイズを小さくする
+						m_Size.x -= 2.5f;
 
-					// レーザー光生成
-					FlashCreate(D3DXVECTOR3(ShotPos), CFlash::FLASH_TYPE_SHOT);
+						// 頂点座標の設定
+						pVtx[0].pos = D3DXVECTOR3((ShotPos.x - m_Size.x / 2), m_Pos.y, 0.0f);
+						pVtx[1].pos = D3DXVECTOR3((ShotPos.x + m_Size.x / 2), m_Pos.y, 0.0f);
+						pVtx[2].pos = D3DXVECTOR3((ShotPos.x - m_Size.x / 2), ShotPos.y, 0.0f);
+						pVtx[3].pos = D3DXVECTOR3((ShotPos.x + m_Size.x / 2), ShotPos.y, 0.0f);
 
-					// レーザー光生成
-					FlashCreate(D3DXVECTOR3(m_PolygonTop), CFlash::FLASH_TYPE_TOP);
+						// ポリゴンの座標
+						m_PolygonPos = D3DXVECTOR3((pVtx[0].pos.x + pVtx[1].pos.x) / 2, (pVtx[0].pos.y + pVtx[2].pos.y) / 2, 0.0f);
+						m_PolygonSize = D3DXVECTOR3(m_Size.x, (ShotPos.y - pVtx[0].pos.y) / 2, 0.0f);
 
-					// // 頂点バッファをアンロック
-					pVtxBuff->Unlock();
+						// 先端の座標
+						if (pVtx[0].pos.y <= ShotPos.y)
+						{
+							m_PolygonTop = D3DXVECTOR3(m_PolygonPos.x, pVtx[0].pos.y + 50.0f, 0.0f);
+						}
+						else
+						{
+							m_PolygonTop = D3DXVECTOR3(ShotPos.x, ShotPos.y + 50.0f, 0.0f);
 
-					if (m_Size.x <= 0)
-					{
-						m_Size.x = 0.0f;
-						return;
+						}
+
+						// レーザー光生成
+						FlashCreate(D3DXVECTOR3(ShotPos), CFlash::FLASH_TYPE_SHOT);
+
+						// レーザー光生成
+						FlashCreate(D3DXVECTOR3(m_PolygonTop), CFlash::FLASH_TYPE_TOP);
+
+						// // 頂点バッファをアンロック
+						pVtxBuff->Unlock();
+
+						if (m_Size.x <= 0)
+						{
+							m_Size.x = 0.0f;
+							return;
+						}
 					}
 				}
+				pScene = pSceneNext;
 			}
 		}
 	}
@@ -388,113 +358,121 @@ void CLaser::DisappearLaser(void)
 //=============================================================================
 bool CLaser::Collision(void)
 {
-	for (int nCount = 0; nCount < MAX_POLYGON; nCount++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
 	{
 		CScene *pScene = NULL;
 		if (pScene == NULL)
 		{
-			// メモリ確保
-			pScene = CScene::GetScene(nCount);
+			// シーンを取得
+			pScene = CScene::GetTop(nCount);
 
-			// メモリのキャスト
-			CScene2D *pScene2D = (CScene2D*)pScene;
-
-			if (pScene2D != NULL)
+			while (pScene)
 			{
-				// ターゲットの情報確保
-				CScene::TYPE type = pScene->GetType();
+				CScene *pSceneNext = pScene->GetNext();
 
-				// エネミーの時
-				if (type == TYPE_ENEMY)
+				TYPE type = pScene->GetType();
+
+				CScene2D *pScene2D = (CScene2D*)pScene;
+
+				if (pScene2D != NULL)
 				{
-					// エネミーの情報取得
-					CEnemy *pEnemy = (CEnemy*)pScene2D;
-					D3DXVECTOR3 TargetPos = pEnemy->GetPosition();
-					D3DXVECTOR3 TargetSize = pEnemy->GetSize();
+					// ターゲットの情報確保
+					CScene::TYPE type = pScene->GetType();
 
-					// 頂点情報を設定
-					VERTEX_2D *pVtx;
-
-					LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-
-					// 頂点バッファをロックし、頂点情報へのポインタを取得
-					pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-					if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
-						TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
-						TargetPos.y - TargetSize.y / 2 < (m_PolygonPos.y + m_PolygonSize.y / 2) + 50.0f &&
-						TargetPos.y + TargetSize.y / 2 > (m_PolygonPos.y - m_PolygonSize.y / 2) - 50.0f)
+					// エネミーの時
+					if (type == TYPE_ENEMY)
 					{
+						// エネミーの情報取得
+						CEnemy *pEnemy = (CEnemy*)pScene2D;
+						D3DXVECTOR3 TargetPos = pEnemy->GetPos();
+						D3DXVECTOR3 TargetSize = pEnemy->GetSize();
+
+						// 頂点情報を設定
+						VERTEX_2D *pVtx;
+
+						LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+						// 頂点バッファをロックし、頂点情報へのポインタを取得
+						pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+						if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
+							TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
+							TargetPos.y - TargetSize.y / 2 < (m_PolygonPos.y + m_PolygonSize.y / 2) + 50.0f &&
+							TargetPos.y + TargetSize.y / 2 > (m_PolygonPos.y - m_PolygonSize.y / 2) - 50.0f)
+						{
 							// プエネミーにダメージを与える
 							pEnemy->HitDamage(LASER_DAMAGE);
+						}
+
+						// // 頂点バッファをアンロック
+						pVtxBuff->Unlock();
+
 					}
-
-					// // 頂点バッファをアンロック
-					pVtxBuff->Unlock();
-
-				}
-				else if (type == TYPE_BOSS)
-				{
-					// ボスの情報取得
-					CBoss *pBoss = (CBoss*)pScene2D;
-					D3DXVECTOR3 TargetPos = pBoss->GetPosition();
-					D3DXVECTOR3 TargetSize = pBoss->GetSize();
-
-					// 頂点情報を設定
-					VERTEX_2D *pVtx;
-
-					LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-
-					// 頂点バッファをロックし、頂点情報へのポインタを取得
-					pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-					if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
-						TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
-						TargetPos.y + TargetSize.y / 2 > m_PolygonTop.y - 50.0f)
+					else if (type == TYPE_BOSS)
 					{
-						// 当たった場所に座標を戻す
-						m_Pos.y = TargetPos.y + TargetSize.y / 2;
-						m_Pos.y -= m_move.y;
+						// ボスの情報取得
+						CBoss *pBoss = (CBoss*)pScene2D;
+						D3DXVECTOR3 TargetPos = pBoss->GetPos();
+						D3DXVECTOR3 TargetSize = pBoss->GetSize();
 
-						// ボスにダメージを与える
-						pBoss->HitBossDamage(LASER_DAMAGE);
-						
-					}
+						// 頂点情報を設定
+						VERTEX_2D *pVtx;
 
-					// // 頂点バッファをアンロック
-					pVtxBuff->Unlock();
+						LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
-				}
-				else if (type == TYPE_BULLET)
-				{
-					// 弾の情報取得
-					CBullet *pBullet = (CBullet*)pScene2D;
-					D3DXVECTOR3 TargetPos = pBullet->GetPosition();
-					D3DXVECTOR3 TargetSize = pBullet->GetSize2D();
+						// 頂点バッファをロックし、頂点情報へのポインタを取得
+						pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-					// 頂点情報を設定
-					VERTEX_2D *pVtx;
-
-					LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-
-					// 頂点バッファをロックし、頂点情報へのポインタを取得
-					pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-					if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
-						TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
-						TargetPos.y - TargetSize.y / 2 < (m_PolygonPos.y + m_PolygonSize.y / 2) + 100.0f &&
-						TargetPos.y + TargetSize.y / 2 > (m_PolygonPos.y - m_PolygonSize.y / 2) - 50.0f)
-					{
-						// 当たり判定処理
+						if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
+							TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
+							TargetPos.y + TargetSize.y / 2 > m_PolygonTop.y - 50.0f)
 						{
-							// 弾を消す
-							pBullet->Uninit();
+							// 当たった場所に座標を戻す
+							m_Pos.y = TargetPos.y + TargetSize.y / 2;
+							m_Pos.y -= m_move.y;
 
+							// ボスにダメージを与える
+							pBoss->HitBossDamage(LASER_DAMAGE);
+
+						}
+
+						// // 頂点バッファをアンロック
+						pVtxBuff->Unlock();
+
+					}
+					else if (type == TYPE_BULLET)
+					{
+						// 弾の情報取得
+						CBullet *pBullet = (CBullet*)pScene2D;
+						D3DXVECTOR3 TargetPos = pBullet->GetPos();
+						D3DXVECTOR3 TargetSize = pBullet->GetSize();
+
+						// 頂点情報を設定
+						VERTEX_2D *pVtx;
+
+						LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+						// 頂点バッファをロックし、頂点情報へのポインタを取得
+						pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+						if (TargetPos.x - TargetSize.x / 2 < m_PolygonPos.x + m_PolygonSize.x / 2 &&
+							TargetPos.x + TargetSize.x / 2 > m_PolygonPos.x - m_PolygonSize.x / 2 &&
+							TargetPos.y - TargetSize.y / 2 < (m_PolygonPos.y + m_PolygonSize.y / 2) + 100.0f &&
+							TargetPos.y + TargetSize.y / 2 > (m_PolygonPos.y - m_PolygonSize.y / 2) - 50.0f)
+						{
+							// 当たり判定処理
+							{
+								// 弾を消す
+								pBullet->Uninit();
+
+							}
 						}
 					}
 				}
+				pScene = pSceneNext;
 			}
 		}
+
 	}
 	return false;
 }

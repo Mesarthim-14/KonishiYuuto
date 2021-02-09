@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// 弾の処理 [bullet.cpp]
+// バレットクラスの処理 [bullet.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -23,6 +23,7 @@
 #include "gage.h"
 #include "spark.h"
 #include "surroundings.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -41,14 +42,9 @@
 #define BULLET_COLOR_MIN			(0)				// 変色の最小値
 
 //=============================================================================
-// static初期化処理
-//=============================================================================
-LPDIRECT3DTEXTURE9 CBullet::m_apTexture[MAX_BULLET_TEXTURE] = {};
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CBullet::CBullet()
+CBullet::CBullet() : CScene2D(TYPE_BULLET)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -95,7 +91,7 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size,
 		case BULLET_COLOR_WHITE:		// 白い弾
 
 			// テクスチャ
-			pBullet->BindTexture(m_apTexture[0]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_000));
 			// アニメーション初期化
 			pBullet->InitAnimation(PLAYER_BULLET_ANIME_SPEED, PLAYER_BULLET_ANIME_COUNTER, -1);
 			break;
@@ -103,7 +99,7 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size,
 		case BULLET_COLOR_BLACK:		// 黒い弾
 
 			// テクスチャ
-			pBullet->BindTexture(m_apTexture[1]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_001));
 			// アニメーション初期化
 			pBullet->InitAnimation(PLAYER_BULLET_ANIME_SPEED, PLAYER_BULLET_ANIME_COUNTER, -1);
 			break;
@@ -120,13 +116,13 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size,
 			// 白い弾
 		case BULLET_COLOR_WHITE:
 			// テクスチャの設定
-			pBullet->BindTexture(m_apTexture[2]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_002));
 			break;
 
 			// 黒い弾
 		case BULLET_COLOR_BLACK:
 			// テクスチャの設定
-			pBullet->BindTexture(m_apTexture[3]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_003));
 			break;
 		}
 	}
@@ -148,7 +144,7 @@ CBullet * CBullet::CounterAttack(
 	{
 		// プレイヤーの情報
 		CPlayer *pPlayer = CGame::GetPlayer();
-		D3DXVECTOR3 Ppos = pPlayer->GetPosition();
+		D3DXVECTOR3 Ppos = pPlayer->GetPos();
 
 		//自機を取得する
 		float fPposx = Ppos.x, fPposy = Ppos.y;		// 自機の座標
@@ -173,14 +169,14 @@ CBullet * CBullet::CounterAttack(
 		case BULLET_COLOR_WHITE:
 
 			// テクスチャ情報
-			pBullet->BindTexture(m_apTexture[2]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_002));
 			break;
 
 			// 黒い弾
 		case BULLET_COLOR_BLACK:
 
 			// テクスチャ情報
-			pBullet->BindTexture(m_apTexture[3]);
+			pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_003));
 			break;
 		}
 
@@ -226,14 +222,14 @@ CBullet * CBullet::CurrentAttack(D3DXVECTOR3 pos, D3DXVECTOR3 Ppos,
 	case BULLET_COLOR_WHITE:		// 白い弾
 
 		// テクスチャ
-		pBullet->BindTexture(m_apTexture[2]);
+		pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_002));
 		break;
 
 		// 黒い弾
 	case BULLET_COLOR_BLACK:
 
 		// テクスチャ
-		pBullet->BindTexture(m_apTexture[3]);
+		pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_003));
 		break;
 	}
 
@@ -278,14 +274,14 @@ CBullet * CBullet::FireWorks(D3DXVECTOR3 pos, D3DXVECTOR3 size,
 	case BULLET_COLOR_WHITE:
 
 		// テクスチャの設定
-		pBullet->BindTexture(m_apTexture[2]);
+		pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_002));
 		break;
 
 		// 黒い弾の処理
 	case BULLET_COLOR_BLACK:
 
 		// テクスチャの設定
-		pBullet->BindTexture(m_apTexture[3]);
+		pBullet->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BULLET_003));
 		break;
 	}
 
@@ -333,7 +329,7 @@ void CBullet::Update(void)
 	CScene2D::Update();
 
 	// 現在の位置を取得
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	// 移動の更新
 	m_Pos += m_move;
@@ -367,27 +363,28 @@ void CBullet::Update(void)
 		m_nLife = 0;
 	}
 
-	for (int nCount = 0; nCount < MAX_POLYGON; nCount++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
 	{
 		CScene *pScene = NULL;
+
 		if (pScene == NULL)
 		{
 			// シーンを取得
-			pScene = CScene::GetScene(nCount);
+			pScene = CScene::GetTop(nCount);
 
-			// メモリのキャスト
-			CScene2D *pScene2D = (CScene2D*)pScene;
-
-			if (pScene2D != NULL)
+			while (pScene)
 			{
-				// 種類を判別
-				CScene::TYPE type = pScene->GetType();
+				CScene *pSceneNext = pScene->GetNext();
+
+				TYPE type = pScene->GetType();
+
+				CScene2D *pScene2D = (CScene2D*)pScene;
 
 				// エネミーの時
 				if (type == TYPE_ENEMY)
 				{
 					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
+					D3DXVECTOR3 Target = pScene2D->GetPos();
 
 					// 敵のサイズ取得
 					CEnemy *pEnemy = (CEnemy*)pScene2D;
@@ -399,9 +396,7 @@ void CBullet::Update(void)
 						// 当たり判定処理
 						if (Collision(Target, size) == true)
 						{
-							// バレットの体力を0
 							m_nLife = 0;
-
 							// エネミーにダメージを与える
 							pEnemy->HitDamage(1);
 							break;
@@ -409,10 +404,9 @@ void CBullet::Update(void)
 					}
 				}
 				else if (type == TYPE_BOSS)
-				{// ボスの時
-
+				{
 					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
+					D3DXVECTOR3 Target = pScene2D->GetPos();
 
 					// 敵のサイズ取得
 					CBoss *pBoss = (CBoss*)pScene2D;
@@ -426,26 +420,23 @@ void CBullet::Update(void)
 						{
 							for (int nCount = 0; nCount < SPARK_BOSS_NUM; nCount++)
 							{
-								// 火花の生成
-								CSpark::Create(D3DXVECTOR3(m_Pos.x, m_Pos.y - 30.0f, 0.0f) ,
+								CSpark::Create(D3DXVECTOR3(m_Pos.x, m_Pos.y - 30.0f, 0.0f),
 									D3DXVECTOR3(SPARK_SIZE_X, SPARK_SIZE_Y, 0.0f),
 									TYPE_EFFECT, SPARK_BOSS_ANGLE, SPARK_BASE_BOSS_ANGLE, SPARK_BOSS_DISTANCE, SPARK_LIFE);
 							}
 
-							// 体力を0に
 							m_nLife = 0;
 
-							// ボスにダメージを与える
+							// エネミーにダメージを与える
 							pBoss->HitBossDamage(2);
 							break;
 						}
 					}
 				}
 				else if (type == TYPE_SURROUNDINGS)
-				{// 取り巻き
-
+				{
 					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
+					D3DXVECTOR3 Target = pScene2D->GetPos();
 
 					// 敵のサイズ取得
 					CSurroundings *pSurroundings = (CSurroundings*)pScene2D;
@@ -457,10 +448,9 @@ void CBullet::Update(void)
 						// 当たり判定処理
 						if (Collision(Target, size) == true)
 						{
-							// 体力を0に
 							m_nLife = 0;
 
-							// 取り巻きにダメージを与える
+							// エネミーにダメージを与える
 							pSurroundings->HitSurroundings(2);
 							break;
 						}
@@ -471,9 +461,8 @@ void CBullet::Update(void)
 				else if (type == TYPE_PLAYER)
 				{
 					// ターゲットの情報確保
-					D3DXVECTOR3 Target = pScene2D->GetPosition();
-
-					// 自分以外の弾の時
+					D3DXVECTOR3 Target = pScene2D->GetPos();
+					// 
 					if (m_type != BULLET_TYPE_PLAYER)
 					{
 						// 当たり判定処理
@@ -486,13 +475,12 @@ void CBullet::Update(void)
 							CPlayer *pPlayer = (CPlayer*)pScene2D;
 							bool bPlayerInfo = pPlayer->GetShildInfo();
 
-							// プレイヤーの色情報
 							if (bPlayerInfo == false)
 							{
 								// 違う色だった時
 								if (m_Ctype == BULLET_COLOR_WHITE)
 								{
-									// プレイヤーにダメージを与える
+									// エネミーにダメージを与える
 									pPlayer->HitDamage(1);
 								}
 								else
@@ -501,7 +489,6 @@ void CBullet::Update(void)
 									CScore *pScore = CGame::GetScore();
 									pScore->SetScore(BULLET_SCORE_NUM);
 
-									// ゲージが溜まる
 									CGage *pGage = pPlayer->GetGage();
 									pGage->AddGage(1);
 								}
@@ -511,7 +498,7 @@ void CBullet::Update(void)
 								// 違う色だった時
 								if (m_Ctype == BULLET_COLOR_BLACK)
 								{
-									// プレイヤーにダメージを与える
+									// エネミーにダメージを与える
 									pPlayer->HitDamage(1);
 								}
 								else
@@ -529,9 +516,12 @@ void CBullet::Update(void)
 						}
 					}
 				}
+
+				pScene = pSceneNext;
 			}
 		}
 	}
+
 }
 
 //=============================================================================
@@ -617,45 +607,6 @@ void CBullet::FlashPolygon(void)
 
 	// 頂点バッファをアンロックする
 	pVtxBuff->Unlock();
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CBullet::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bullet000.png",
-		&m_apTexture[0]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bullet001.png",
-		&m_apTexture[1]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bullet002.png",
-		&m_apTexture[2]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/赤バリア.png",
-		&m_apTexture[3]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CBullet::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_BULLET_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }
 
 //=============================================================================

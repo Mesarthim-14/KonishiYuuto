@@ -1,9 +1,8 @@
 #ifndef _UI_H_
 #define _UI_H_
-
 //=============================================================================
 //
-// UIクラスヘッダー
+// UIクラスヘッダー	[ui.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -22,7 +21,6 @@
 #define WAKU_SIZE_Y	(720)		// ワクのサイズ
 #define SHIP_SIZE_X (60)		// 自機のUIサイズ
 #define SHIP_SIZE_Y (40)		// 自機のUIサイズ
-#define MAX_UI_TEXTURE (3)		// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -44,7 +42,7 @@ public:
 		UI_TYPE_MAX
 	}UI_TYPE;
 
-	CUi();			// コンストラクタ
+	CUi(TYPE Priority = TYPE_UI);			// コンストラクタ
 	~CUi();			// デストラクタ
 
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);	// 初期化処理
@@ -54,15 +52,12 @@ public:
 
 	static CUi * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size,		// ポリゴン生成
 		TYPE type, UI_TYPE Utype);
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 
 	void SetType(UI_TYPE Utype);								// Uiタイプの設定
 
 private:
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_move;											// 移動量
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_UI_TEXTURE];		// テクスチャ情報のポインタ
 	UI_TYPE m_Utype;											// Uiの種類
 };
 

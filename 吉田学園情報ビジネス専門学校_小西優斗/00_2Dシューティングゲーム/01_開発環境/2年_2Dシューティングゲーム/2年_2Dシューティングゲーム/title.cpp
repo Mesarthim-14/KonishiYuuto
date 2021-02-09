@@ -71,6 +71,7 @@ void CTitle::Uninit(void)
 	if (m_pTitleBg != NULL)
 	{
 		m_pTitleBg->Uninit();
+		m_pTitleBg = NULL;
 	}
 }
 

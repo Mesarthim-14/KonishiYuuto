@@ -10,7 +10,7 @@
 //=============================================================================
 // インクルード
 //=============================================================================
-#include "scene2d.h"
+#include "character.h"
 
 //=============================================================================
 // マクロ定義
@@ -24,7 +24,6 @@
 //=============================================================================
 // 前方宣言
 //=============================================================================
-class CScene2D;
 class CShield;
 class CGage;
 class CLaser;
@@ -33,19 +32,9 @@ class CBombUi;
 //=============================================================================
 // プレイヤークラス
 //=============================================================================
-class CPlayer : public CScene2D
+class CPlayer : public CCharacter
 {
 public:
-	typedef enum
-	{
-		// プレイヤーの状態
-		PLAYER_STATE_NONE = 0,		// 初期値
-		PLAYER_STATE_NORMAL,		// 通常状態
-		PLAYER_STATE_REVIVE,		// 復活時
-		PLAYER_STATE_LASER,			// レーザー発射時
-		PLAYER_STATE_MAX
-	}PLAYER_STATE;
-
 	CPlayer();			// コンストラクタ
 	~CPlayer();			// デストラクタ
 
@@ -54,28 +43,25 @@ public:
 	void Update(void);														// 更新処理
 	void Draw(void);														// 描画処理
 
-	static HRESULT Load(void);												// テクスチャのロード
-	static void UnLoad(void);												// テクスチャのアンロード
+	// static関数
 	static CPlayer * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);	// ポリゴン生成
-
-	void HitDamage(int nCount);												// ダメージ処理
+	
+	// メンバ関数
 	void PlayerControl(void);												// プレイヤー制御
 	void Resurrection(void);												// 復活
 	void UpdateState(void);													// プレイヤー状態更新
 	bool BombCollision(void);												// ボムの当たり判定
+	void Death(void);														// 死んだときの処理
+
+	// Get関数
 	bool GetUseLaser(void);													// レーザーの情報
 	bool GetShildInfo(void);												// シールドの情報
 	CGage *GetGage(void);													// レーザーゲージ
 	CLaser *GetLaser(void);													// レーザーの情報
 
 private:
-	D3DXVECTOR3 m_Pos;						// 座標
-	D3DXVECTOR3 m_Move;						// 移動量
-	PLAYER_STATE m_State;					// プレイヤーの状態
 	int m_StateCount;						// プレイヤーの状態カウンター
 	int m_BulletState;						// バレット間隔のカウンター
-	static LPDIRECT3DTEXTURE9 m_pTexture;	// テクスチャのポインタ
-	int m_nLife;							// 自機の体力
 	int m_nStock;							// ストック
 	int m_nResurrectionCnt;					// 復活フレーム
 	int m_nLaserFlame;						// レーザーのカウント

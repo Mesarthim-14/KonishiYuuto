@@ -18,7 +18,6 @@
 //=============================================================================
 #define MUZZLE_FLASH_SIZE_X				(18)		// サイズ
 #define MUZZLE_FLASH_SIZE_Y				(18)		// サイズ
-#define MAX_MUZZLE_FLASH_TEXTURE		(1)			// テクスチャ数
 #define MUZZLE_FLASH_LIFE				(8)			// ライフ
 #define MUZZLE_FLASH_NUM				(30)		// 数
 
@@ -62,8 +61,6 @@ public:
 		TYPE type, EFFECT_COLOR Ctype, int nLife);
 
 	void SetMove(D3DXVECTOR3 move);								// 移動量設定
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 	void SetColor(EFFECT_COLOR Ctype);							// カラー設定
 	void InitColor(void);										// カラー初期化処理
 	void GetPlayerPos(void);									// プレイヤー座標取得
@@ -71,7 +68,6 @@ private:
 	D3DXVECTOR3 m_Pos;													// 座標
 	D3DXVECTOR3 m_move;													// 移動量
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;									// 頂点バッファのポインタ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_MUZZLE_FLASH_TEXTURE];	// テクスチャ情報のポインタ
 	EFFECT_COLOR m_Ctype;												// カラータイプ
 	EFFECT_TYPE m_Etype;												// エフェクトタイプ
 	int m_nLife;														// 体力　

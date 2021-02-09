@@ -37,7 +37,7 @@ class CNumber;
 class CRanking : public CScene
 {
 public:
-	CRanking();				// コンストラクタ
+	CRanking(TYPE Priority = TYPE_SCORE);				// コンストラクタ
 	~CRanking();			// デストラクタ
 
 	// メンバ関数

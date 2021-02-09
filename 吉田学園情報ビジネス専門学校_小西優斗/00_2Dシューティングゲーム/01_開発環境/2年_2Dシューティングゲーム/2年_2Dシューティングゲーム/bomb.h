@@ -1,6 +1,5 @@
 #ifndef _BOMB_H_
 #define _BOMB_H_
-
 //=============================================================================
 //
 // ボムクラスヘッダー [bomb.h]
@@ -20,7 +19,6 @@
 #define BOMB_SIZE_Y				(50)		// 縦サイズ
 #define BOMB_SPARK_SIZE_X		(8)			// 横サイズ
 #define BOMB_SPARK_SIZE_Y		(8)			// 縦サイズ
-#define MAX_BOMB_TEXTURE		(1)			// テクスチャ数
 
 #define BOMB_LIFE				(25)		// ボムの体力
 #define BOMB_BASE_ANGLE			(90)		// 火花の向き
@@ -77,15 +75,11 @@ public:
 		TYPE type, BOMB_TYPE Btype, BOMB_COLOR BColor,
 		int nAngle, int nBaseAngle, int nDistance, int nLife);
 
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
-
 	void InitColor(void);										// エフェクトのカラーを設定
 private:
 	D3DXVECTOR3 m_Pos;
 	D3DXVECTOR3 m_move;
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;							// 頂点バッファのポインタ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_BOMB_TEXTURE];	// テクスチャ情報のポインタ
 	int m_nLife;												// 体力
 	D3DXVECTOR3 m_TargetOld;									// 標的の古い座標
 	BOMB_COLOR m_BColor;

@@ -1,6 +1,6 @@
 //=========================================================
 //
-// 体力バークラスヘッダー	[hpber.cpp]
+// 体力バークラス	[hpber.cpp]
 // Author : Konishi Yuuto
 //
 //=========================================================
@@ -13,11 +13,7 @@
 #include "renderer.h"
 #include "boss.h"
 #include "game.h"
-
-//=========================================================
-// static初期化
-//=========================================================
-LPDIRECT3DTEXTURE9 CHpbar::m_apTexture[MAX_HPBAR_TEXTURE] = {};
+#include "texture.h"
 
 //=========================================================
 // ポリゴン生成
@@ -30,7 +26,6 @@ CHpbar * CHpbar::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife)
 	pHpbar->m_nMaxLife = nLife;				// 体力の設定
 	pHpbar->m_nLife = nLife;				// ライフの設定
 	pHpbar->SetType(type);					// 種類の設定
-	pHpbar->BindTexture(m_apTexture[0]);	// テクスチャの設定
 	pHpbar->Init(pos, size, type);			// 初期化
 
 	return pHpbar;
@@ -39,7 +34,7 @@ CHpbar * CHpbar::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife)
 //=========================================================
 // コンストラクタ
 //=========================================================
-CHpbar::CHpbar()
+CHpbar::CHpbar(TYPE Priority) : CScene(Priority)
 {
 	m_pVtxBuff = NULL;
 	m_nLife = 0;
@@ -113,7 +108,7 @@ HRESULT CHpbar::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //=========================================================
 void CHpbar::Uninit(void)
 {
-
+	Release();
 }
 
 //=========================================================
@@ -190,46 +185,17 @@ void CHpbar::Draw(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 	// テクスチャの設定
-	pDevice->SetTexture(0, m_apTexture[0]);
+	pDevice->SetTexture(0, CTexture::GetTexture(CTexture::TEXTURE_NUM_HPBAR));
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,		// プリミティブの種類
 		0,
-		NUM_POLYGON);				// プリミティブの数}
-}
+		NUM_POLYGON);				// プリミティブの数
 
-//=========================================================
-// テクスチャロード
-//=========================================================
-HRESULT CHpbar::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+	// テクスチャの設定
+	pDevice->SetTexture(0, NULL);
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/3Dgame_HPbar001.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=========================================================
-// テクスチャアンロード
-//=========================================================
-void CHpbar::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_HPBAR_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }
 
 //=========================================================

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// シールド処理 [shield.cpp]
+// シールドクラス [shield.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -13,11 +13,7 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CShield::m_apTexture[MAX_SHILD_TEXTURE] = {};
+#include "texture.h"
 
 //=============================================================================
 // インスタンス生成
@@ -37,12 +33,12 @@ CShield * CShield::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size, T
 		{
 		case SHIELD_TYPE_WHITE:
 			// テクスチャ
-			pShield->BindTexture(m_apTexture[0]);
+			pShield->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BARRIER_BLUE));
 			break;
 
 		case SHIELD_TYPE_BLACK:
 			// テクスチャ
-			pShield->BindTexture(m_apTexture[1]);
+			pShield->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BARRIER_RED));
 			break;
 		}
 	}
@@ -50,44 +46,9 @@ CShield * CShield::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size, T
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CShield::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/バリア1.png",
-		&m_apTexture[0]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/赤バリア.png",
-		&m_apTexture[1]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CShield::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_SHILD_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CShield::CShield()
+CShield::CShield() : CScene2D(TYPE_SHIELD)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

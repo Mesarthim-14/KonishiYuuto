@@ -1,6 +1,5 @@
 #ifndef _TITLEBG_H_
 #define _TITLEBG_H_
-
 //=============================================================================
 //
 // タイトル背景クラスヘッダー	[titlebg.h]
@@ -12,11 +11,6 @@
 // インクルード
 //=============================================================================
 #include "scene2d.h"
-
-//=============================================================================
-// マクロ定義
-//=============================================================================
-#define MAX_TITLEBG_TEXTURE		(1)			// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -39,13 +33,9 @@ public:
 
 	static CTitleBg * Create(									// ポリゴン設定
 		D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
-
 private:
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_move;											// 移動量
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_TITLEBG_TEXTURE];	// テクスチャ情報のポインタ
 };
 
 #endif

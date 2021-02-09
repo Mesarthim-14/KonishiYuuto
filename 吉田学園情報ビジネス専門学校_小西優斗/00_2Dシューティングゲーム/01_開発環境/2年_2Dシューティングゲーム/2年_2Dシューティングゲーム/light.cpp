@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// 敵の光処理 [light.cpp]
+// ライトクラス [light.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -13,11 +13,7 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CLight::m_apTexture[MAX_LIGHT_TEXTURE] = {};
+#include "texture.h"
 
 //=============================================================================
 // インスタンス生成
@@ -33,45 +29,12 @@ CLight * CLight::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move,
 		// 初期化処理
 		pLight->Init(pos, size, type);			// 初期化情報
 		pLight->SetMove(move);					// 移動量
-		pLight->BindTexture(m_apTexture[0]);	// テクスチャ設定
+		pLight->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));	// テクスチャ設定
 		pLight->SetColor(Ltype);				// 色の設定
 		pLight->InitColor();					// 色の初期化
 	}
 
 	return pLight;
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CLight::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CLight::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_LIGHT_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }
 
 //=============================================================================
@@ -121,7 +84,7 @@ void CLight::InitColor(void)
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CLight::CLight()
+CLight::CLight() : CScene2D(TYPE_LIGHT)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

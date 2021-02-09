@@ -48,7 +48,7 @@ CAlert * CAlert::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CAlert::CAlert()
+CAlert::CAlert() : CPolygon(TYPE_WARNING)
 {
 	m_nSubNumber = 255;
 	m_nSubNum = SUB_COLOR_NUM;
@@ -83,6 +83,9 @@ void CAlert::Uninit(void)
 {
 	// 終了処理
 	CPolygon::Uninit();
+
+	// 終了フラグ
+	Release();
 }
 
 //=====================================================
@@ -111,6 +114,7 @@ void CAlert::Draw(void)
 //=====================================================
 void CAlert::InitColor(void)
 {
+	// バッファ受け取り
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
 	// 頂点情報を設定

@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // サウンド処理 [sound.h]
-// Author : 小西優斗
+// Author : Konishi Yuuto
 //
 //=============================================================================
 #ifndef _SOUND_H_
@@ -73,22 +73,22 @@ private:
 	// 各音素材のパラメータ
 	SOUNDPARAM m_aParam[SOUND_LABEL_MAX] =
 	{
-		{ "date/SOUND/title.wav", -1 },				// タイトル
-		{ "date/SOUND/game.wav", -1 },				// ゲーム
-		{ "date/SOUND/result.wav", -1 },			// リザルト
-		{ "date/SOUND/button000.wav", 0 },			// ボタン
-		{ "date/SOUND/shot.wav", 0 },				// ショット
-		{ "date/SOUND/explosion000.wav", 0 },		// 爆発
-		{ "date/SOUND/BossExplosion.wav", 0 },		// ボスの爆発
-		{ "date/SOUND/laser000.wav", -1 },			// レーザー
-		{ "date/SOUND/bomb.wav", 0 },				// ボム
-		{ "date/SOUND/icon.wav", 0 },				// アイコン
-		{ "date/SOUND/message.wav", 0 },			// メッセージ
-		{ "date/SOUND/alert.wav", -1 },				// アラート
-		{ "date/SOUND/warning.wav", 0 },			// WARNING
-		{ "date/SOUND/boss.wav", 0 },				// ボス
-		{ "date/SOUND/Hit.wav", 0 },				// ボスのヒット
-		{ "date/SOUND/change.wav", -1 },			// ボスのヒット
+		{ "data/SOUND/title.wav", -1 },				// タイトル
+		{ "data/SOUND/game.wav", -1 },				// ゲーム
+		{ "data/SOUND/result.wav", -1 },			// リザルト
+		{ "data/SOUND/button000.wav", 0 },			// ボタン
+		{ "data/SOUND/shot.wav", 0 },				// ショット
+		{ "data/SOUND/explosion000.wav", 0 },		// 爆発
+		{ "data/SOUND/BossExplosion.wav", 0 },		// ボスの爆発
+		{ "data/SOUND/laser000.wav", -1 },			// レーザー
+		{ "data/SOUND/bomb.wav", 0 },				// ボム
+		{ "data/SOUND/icon.wav", 0 },				// アイコン
+		{ "data/SOUND/message.wav", 0 },			// メッセージ
+		{ "data/SOUND/alert.wav", -1 },				// アラート
+		{ "data/SOUND/warning.wav", 0 },			// WARNING
+		{ "data/SOUND/boss.wav", 0 },				// ボス
+		{ "data/SOUND/Hit.wav", 0 },				// ボスのヒット
+		{ "data/SOUND/change.wav", -1 },			// ボスのヒット
 	};
 };
 

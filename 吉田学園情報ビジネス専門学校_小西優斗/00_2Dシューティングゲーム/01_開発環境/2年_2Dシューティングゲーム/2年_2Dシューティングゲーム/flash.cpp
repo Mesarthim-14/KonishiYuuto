@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// フラッシュ処理 [flash.cpp]
+// フラッシュクラス [flash.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -15,6 +15,7 @@
 #include "sound.h"
 #include "game.h"
 #include "laser.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -22,11 +23,6 @@
 #define FLASH_ANGLE		(360)			// 角度
 #define FLASH_SPPED		(1.5f)			// 速度
 #define FLASH_DISTANCE	(14)			// 距離
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CFlash::m_apTexture[MAX_FLASH_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -58,7 +54,7 @@ CFlash * CFlash::Create(D3DXVECTOR3 pos,
 		pFlash->SetFType(Ftype);				// 種類
 		pFlash->SetColor(Ctype);				// 色
 		pFlash->InitColor();					// 色の初期化
-		pFlash->BindTexture(m_apTexture[0]);	// テクスチャ設定
+		pFlash->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));	// テクスチャ設定
 		pFlash->m_nLife = nLife;				// ライフ設定
 	}
 
@@ -66,42 +62,9 @@ CFlash * CFlash::Create(D3DXVECTOR3 pos,
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CFlash::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CFlash::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_FLASH_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CFlash::CFlash()
+CFlash::CFlash() :CEffect(TYPE_EFFECT)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -254,7 +217,7 @@ void CFlash::GetPlayerPos(void)
 	if (nNum % 2 == 0)
 	{
 		// ターゲットの情報確保
-		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPosition().x - PLAYER_SHOT_POS_X, pPlayer->GetPosition().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
+		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPos().x - PLAYER_SHOT_POS_X, pPlayer->GetPos().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
 
 		// 位置を更新
 		D3DXVECTOR3 TargetMove = D3DXVECTOR3(Target.x - m_TargetOld.x, Target.y - m_TargetOld.y, 0.0f);
@@ -271,7 +234,7 @@ void CFlash::GetPlayerPos(void)
 	else
 	{
 		// ターゲットの情報確保
-		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPosition().x + PLAYER_SHOT_POS_X, pPlayer->GetPosition().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
+		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPos().x + PLAYER_SHOT_POS_X, pPlayer->GetPos().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
 
 		// 位置を更新
 		D3DXVECTOR3 TargetMove = D3DXVECTOR3(Target.x - m_TargetOld.x, Target.y - m_TargetOld.y, 0.0f);

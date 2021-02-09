@@ -29,7 +29,7 @@ class CNumber;
 class CRemain : public CScene
 {
 public:
-	CRemain();			// コンストラクタ
+	CRemain(TYPE Priority = TYPE_SCORE);			// コンストラクタ
 	~CRemain();			// デストラクタ
 
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);		// 初期化処理

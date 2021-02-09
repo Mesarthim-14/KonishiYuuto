@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// 花火最初のやつの処理 [fire.cpp]
+// 花火の処理 [fire.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -14,6 +14,7 @@
 #include "sound.h"
 #include "bullet.h"
 #include "time.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -22,14 +23,9 @@
 #define FIRE_DISTANCE		(200)			// 発生する距離
 
 //=============================================================================
-// static初期化処理
-//=============================================================================
-LPDIRECT3DTEXTURE9 CFire::m_apTexture[MAX_FIRE_TEXTURE] = {};
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CFire::CFire()
+CFire::CFire() :CScene2D(TYPE_BULLET)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -61,7 +57,7 @@ CFire * CFire::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size,
 	pFire->SetFire(nLife, size);											// 弾の設定
 	pFire->InitMove();														// 移動量設定
 	pFire->m_nLife = nLife;													// 体力の代入
-	pFire->BindTexture(m_apTexture[0]);										// テクスチャ設定
+	pFire->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));	// テクスチャ設定
 
 	return pFire;
 }
@@ -95,7 +91,7 @@ void CFire::Update(void)
 	CScene2D::Update();
 
 	// 現在の位置を取得
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	// 移動の更新
 	m_Pos += m_move;
@@ -188,39 +184,6 @@ void CFire::SetFire(int nLife, D3DXVECTOR3 size)
 void CFire::SetType(FIRE_COLOR Ctype)
 {
 	m_Ctype = Ctype;
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CFire::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CFire::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_FIRE_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }
 
 //=============================================================================

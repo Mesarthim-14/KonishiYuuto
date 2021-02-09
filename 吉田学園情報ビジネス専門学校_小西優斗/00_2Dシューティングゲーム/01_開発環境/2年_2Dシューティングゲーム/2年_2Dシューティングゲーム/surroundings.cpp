@@ -21,17 +21,13 @@
 #include "boss.h"
 #include "player.h"
 #include "explosion.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define SURROUNDINGS_LIFE				(500)		// 取り巻きの体力
 #define SURROUNDINGS_BULLET_INTERVAL	(30)		// バレット間隔
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CSurroundings::m_apTexture[MAX_SURROUNDINGS_TEXTURE] = {};
 
 //=============================================================================
 // ポリゴン生成
@@ -47,7 +43,7 @@ CSurroundings * CSurroundings::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE ty
 		pSurroundings->Init(pos, size, type);
 
 		// テクスチャ設定
-		pSurroundings->BindTexture(m_apTexture[0]);
+		pSurroundings->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_SURROUNDINGS));
 
 		// ボスステータス設定
 		pSurroundings->SetPos(pos);					// 座標
@@ -59,42 +55,9 @@ CSurroundings * CSurroundings::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE ty
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CSurroundings::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/enemy_q.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CSurroundings::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_SURROUNDINGS_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CSurroundings::CSurroundings()
+CSurroundings::CSurroundings() : CEnemy(TYPE_SURROUNDINGS)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -102,7 +65,7 @@ CSurroundings::CSurroundings()
 	m_nBulletFlame = 0;
 	m_nBulletCnt = 0;
 	m_bColorFlag = true;
-	m_State = ENEMY_STATE_NORMAL;
+	m_State = STATE_NORMAL;
 	m_nStateCnt = 0;
 	m_nFlashFlame = 0;
 	m_nSubNumber = 0;
@@ -146,15 +109,15 @@ void CSurroundings::Update(void)
 	// 更新処理
 	CScene2D::Update();
 	// 座標更新
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 	// 移動の更新
 	m_Pos += m_Move;
 
 	switch (m_State)
 	{
-	case ENEMY_STATE_NORMAL:
+	case STATE_NORMAL:
 		break;
-	case ENEMY_STATE_DAMAGE:
+	case STATE_DAMAGE:
 		m_nStateCnt++;
 		LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 		// 頂点情報を設定
@@ -174,7 +137,7 @@ void CSurroundings::Update(void)
 		if (m_nStateCnt >= 5)
 		{
 			// 状態を戻す
-			m_State = ENEMY_STATE_NORMAL;
+			m_State = STATE_NORMAL;
 
 			// 頂点カラーの設定
 			pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);	// 左上頂点の色	透明度255
@@ -193,7 +156,7 @@ void CSurroundings::Update(void)
 	SetPos(m_Pos);
 
 	// 弾を打つ処理
-	BulletShot();
+	BulletUpdate();
 
 	// 当たり判定
 	Collision();
@@ -234,7 +197,7 @@ void CSurroundings::Draw(void)
 //=============================================================================
 // 弾を打つ処理
 //=============================================================================
-void CSurroundings::BulletShot(void)
+void CSurroundings::BulletUpdate(void)
 {
 	m_nBulletFlame++;
 
@@ -249,7 +212,7 @@ void CSurroundings::BulletShot(void)
 		{
 			// プレイヤーの情報取得
 			CPlayer *pPlayer = CGame::GetPlayer();
-			D3DXVECTOR3 Target = pPlayer->GetPosition();
+			D3DXVECTOR3 Target = pPlayer->GetPos();
 
 			D3DXVECTOR3 RandomPos = D3DXVECTOR3(Target.x - rand() % 50 + rand() % 50 - rand() % 50 + rand() % 50, Target.y, 0.0f);
 
@@ -263,7 +226,7 @@ void CSurroundings::BulletShot(void)
 		{
 			// プレイヤーの情報取得
 			CPlayer *pPlayer = CGame::GetPlayer();
-			D3DXVECTOR3 Target = pPlayer->GetPosition();
+			D3DXVECTOR3 Target = pPlayer->GetPos();
 
 			D3DXVECTOR3 RandomPos = D3DXVECTOR3(Target.x - rand() % 50 + rand() % 50 - rand() % 50 + rand() % 50, Target.y, 0.0f);
 
@@ -277,6 +240,13 @@ void CSurroundings::BulletShot(void)
 		// 値初期化
 		m_nBulletFlame = 0;
 	}
+}
+
+//=============================================================================
+// 移動量更新
+//=============================================================================
+void CSurroundings::MoveUpdate(void)
+{
 }
 
 //=============================================================================

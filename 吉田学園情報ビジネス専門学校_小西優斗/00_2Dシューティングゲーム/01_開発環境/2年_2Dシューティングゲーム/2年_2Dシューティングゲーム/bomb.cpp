@@ -13,11 +13,11 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // static初期化
 //=============================================================================
-LPDIRECT3DTEXTURE9 CBomb::m_apTexture[MAX_BOMB_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -63,7 +63,7 @@ CBomb * CBomb::Create(D3DXVECTOR3 pos,
 			pBomb->InitColor();
 
 			// テクスチャ設定
-			pBomb->BindTexture(m_apTexture[0]);
+			pBomb->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));
 
 			// ライフ
 			pBomb->m_nLife = nLife;
@@ -96,7 +96,7 @@ CBomb * CBomb::Create(D3DXVECTOR3 pos,
 			pBomb->InitColor();
 
 			// テクスチャ設定
-			pBomb->BindTexture(m_apTexture[0]);
+			pBomb->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));
 
 			// ライフの処理
 			pBomb->m_nLife = nLife - rand() % 20;
@@ -111,7 +111,7 @@ CBomb * CBomb::Create(D3DXVECTOR3 pos,
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CBomb::CBomb()
+CBomb::CBomb() : CEffect(TYPE_EFFECT)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -147,6 +147,7 @@ void CBomb::Uninit(void)
 {
 	// 2Dポリゴン終了処理
 	CScene2D::Uninit();
+	Release();
 }
 
 //=============================================================================
@@ -230,37 +231,4 @@ void CBomb::InitColor(void)
 
 	// 頂点バッファをアンロックする
 	pVtxBuff->Unlock();
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CBomb::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CBomb::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_BOMB_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }

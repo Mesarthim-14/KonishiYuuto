@@ -1,6 +1,5 @@
 #ifndef _SPARK_H_
 #define _SPARK_H_
-
 //=============================================================================
 //
 // 火花クラスヘッダー [spark.h]
@@ -61,8 +60,6 @@ public:
 	static CSpark * Create(										// ポリゴン生成
 		D3DXVECTOR3 pos, D3DXVECTOR3 size,
 		TYPE type, int nAngle,  int nBaseAngle, int nDistance, int nLife);
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 
 	void InitColor(void);										// エフェクトのカラーを設定
 	void SetMove(D3DXVECTOR3 move);								// 移動の設定
@@ -71,7 +68,6 @@ private:
 	D3DXVECTOR3 m_Pos;
 	D3DXVECTOR3 m_move;
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;		// 頂点バッファのポインタ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_SPARK_TEXTURE];		// テクスチャ情報のポインタ
 	int m_nLife;							// 体力
 	D3DXVECTOR3 m_TargetOld;				// 標的の古い座標
 };

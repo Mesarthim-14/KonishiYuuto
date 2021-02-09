@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ゲージクラス		[gage.cpp]
+// ゲージクラス	[gage.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -13,17 +13,13 @@
 #include "manager.h"
 #include "player.h"
 #include "game.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define MAX_GAGE_NUM	(100)		// ゲージの最大値
 #define FLASH_FLAME		(8)			// 点滅のフレーム
-
-//=============================================================================
-// static初期化処理
-//=============================================================================
-LPDIRECT3DTEXTURE9 CGage::m_apTexture[MAX_GAGE_TEXTURE] = {};	// テクスチャ情報のポインタ
 
 //=============================================================================
 // クリエイト
@@ -43,11 +39,11 @@ CGage * CGage::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, GAGE_TYPE Gt
 	{
 	case GAGE_TYPE_BLUE:
 		// バーのメイン
-		pGage->BindTexture(m_apTexture[0]);
+		pGage->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_GAGEBAR_000));
 		break;
 	case GAGE_TYPE_FLAME:
 		// バーの枠
-		pGage->BindTexture(m_apTexture[1]);
+		pGage->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_GAGEBAR_001));
 		break;
 	}
 
@@ -57,7 +53,7 @@ CGage * CGage::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, GAGE_TYPE Gt
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CGage::CGage()
+CGage::CGage() : CUi(TYPE_SCORE)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 座標
 	m_Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
@@ -173,42 +169,6 @@ void CGage::Draw(void)
 {
 	// 描画処理
 	CUi::Draw();
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CGage::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/GageBar222.png",
-		&m_apTexture[0]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Gagebar111.png",
-		&m_apTexture[1]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CGage::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_GAGE_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-
 }
 
 //=============================================================================

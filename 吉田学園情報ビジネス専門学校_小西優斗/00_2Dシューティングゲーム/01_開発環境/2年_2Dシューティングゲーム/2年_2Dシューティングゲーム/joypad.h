@@ -1,6 +1,5 @@
 #ifndef _JOYPAD_H_
 #define _JOYPAD_H_
-
 //===============================
 //
 // ジョイパッドヘッダ [joypad.h]

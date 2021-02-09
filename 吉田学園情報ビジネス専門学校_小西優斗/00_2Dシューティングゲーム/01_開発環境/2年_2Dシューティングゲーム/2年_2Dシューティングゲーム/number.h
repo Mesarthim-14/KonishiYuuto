@@ -2,15 +2,10 @@
 #define _NUMBER_H_
 //=============================================================================
 //
-// ナンバーヘッダー [number.h]
+// ナンバークラスヘッダー [number.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
-
-//=============================================================================
-// マクロ定義
-//=============================================================================
-#define MAX_NUMBER_TEXTURE (2)		// テクスチャの最大数
 
 //=============================================================================
 // レンダラークラス
@@ -38,7 +33,7 @@ public:
 		NUMBER_TYPE_MAX
 	}NUMBER_TYPE;
 
-	CNumber();				// コンストラクタ
+	CNumber(TYPE Priority = TYPE_SCORE);				// コンストラクタ
 	~CNumber();				// デストラクタ
 
 	// メンバ関数
@@ -46,11 +41,9 @@ public:
 	void Uninit(void);															// 終了処理
 	void Update(void);															// 更新処理
 	void Draw(void);															// 描画処理
-	static HRESULT Load(void);													// テクスチャロード
-	static void UnLoad(void);													// テクスチャアンロード
 	static CNumber * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, 
 		TYPE type, NUMBER_TYPE Ntype);											// クリエイト
-	void BindTexture(LPDIRECT3DTEXTURE9 pTexture);								// テクスチャの設定
+	void BindTexture(const LPDIRECT3DTEXTURE9 pTexture);								// テクスチャの設定
 	void SetNumber(int nScore);													// ナンバーの設定
 	void NumberInit(D3DXVECTOR3 pos, D3DXVECTOR3 size);							// ナンバー初期化設定
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void);									// バッファ情報
@@ -61,7 +54,7 @@ private:
 	D3DXVECTOR3 m_Size;											// サイズ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;							// バッファ
 	D3DXVECTOR3 m_Move;											// 移動
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_NUMBER_TEXTURE];	// テクスチャのポインタ
+	LPDIRECT3DTEXTURE9 m_pTexture;								// テクスチャポインタ
 	static LPDIRECT3DDEVICE9 m_pDevice;							// デバイスのポインタ
 	NUMBER_TYPE m_Ntype;										// ナンバーのタイプ
 };

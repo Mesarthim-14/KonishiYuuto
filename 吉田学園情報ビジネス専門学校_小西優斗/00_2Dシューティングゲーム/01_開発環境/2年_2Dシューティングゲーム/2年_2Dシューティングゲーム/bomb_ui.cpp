@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ボム数のUI [bomb_ui.cpp]
+// ボムのUI [bomb_ui.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -11,11 +11,11 @@
 #include "bomb_ui.h"
 #include "renderer.h"
 #include "manager.h"
+#include "texture.h"
 
 //=============================================================================
 // static初期化
 //=============================================================================
-LPDIRECT3DTEXTURE9 CBombUi::m_apTexture[MAX_BOMB_UI_TEXTURE] = {};
 
 //====================================================================
 // ポリゴン生成
@@ -31,7 +31,7 @@ CBombUi * CBombUi::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		pBombUi->Init(pos, size, type);
 
 		// テクスチャの設定
-		pBombUi->BindTexture(m_apTexture[0]);
+		pBombUi->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BOMB_UI));
 	}
 
 	return pBombUi;
@@ -40,7 +40,7 @@ CBombUi * CBombUi::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CBombUi::CBombUi()
+CBombUi::CBombUi() : CScene2D(TYPE_BOMB)
 {
 
 }
@@ -88,37 +88,4 @@ void CBombUi::Draw(void)
 {
 	// 描画処理
 	CScene2D::Draw();
-}
-
-//====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CBombUi::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bomb000.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CBombUi::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_BOMB_UI_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }

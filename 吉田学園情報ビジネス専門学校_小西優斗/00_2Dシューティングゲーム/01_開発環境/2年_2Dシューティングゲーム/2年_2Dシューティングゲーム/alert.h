@@ -30,20 +30,20 @@ class CWarning;
 class CAlert : public CPolygon
 {
 public:
-	CAlert();										// コンストラクタ
-	~CAlert();										// デストラクタ
+	CAlert();	// コンストラクタ
+	~CAlert();	// デストラクタ
 
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 move, TYPE type);					// 初期化処理
-	void Uninit(void);															// 終了処理
-	void Update(void);															// 更新処理
-	void Draw(void);															// 描画処理
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 move, TYPE type);				// 初期化処理
+	void Uninit(void);														// 終了処理
+	void Update(void);														// 更新処理
+	void Draw(void);														// 描画処理
 
-	static CAlert *Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, TYPE type);		// ポリゴン生成
+	static CAlert *Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, TYPE type);	// ポリゴン生成
 
-	void FlashPolygon(void);													// ポリゴンの点滅
-	void CreateAlertLogo(void);													// アラートロゴの生成
-	void InitColor(void);														// 色の初期化
-	bool GetAlertFlag(void);													// アラートのフラグ情報
+	void FlashPolygon(void);												// ポリゴンの点滅
+	void CreateAlertLogo(void);												// アラートロゴの生成
+	void InitColor(void);													// 色の初期化
+	bool GetAlertFlag(void);												// アラートのフラグ情報
 
 private:
 	int m_nSubNumber;			// カラー減算

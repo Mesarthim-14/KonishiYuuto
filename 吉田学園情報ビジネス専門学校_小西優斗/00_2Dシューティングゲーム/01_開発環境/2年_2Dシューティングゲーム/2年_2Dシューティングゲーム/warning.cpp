@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// アラートロゴクラス [warning.cpp]
+// 警告クラス [warning.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "alert.h"
+#include "texture.h"
 
 //====================================================================
 // マクロ定義
@@ -21,11 +22,6 @@
 #define WARNING_COLOR_MAX	(150)		// カラー変更の最大
 #define WARNING_COLOR_MIN	(0)			// カラー変更の最小
 #define WARNING_CHANGE_TIME	(35)		// カラーを変えるフレーム
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CWarning::m_apTexture[MAX_WARNING_TEXTURE] = {};
 
 //====================================================================
 // ポリゴン生成
@@ -41,7 +37,7 @@ CWarning * CWarning::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		pWarning->Init(pos, size, type);
 
 		// テクスチャの設定
-		pWarning->BindTexture(m_apTexture[0]);
+		pWarning->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_WARNING));
 
 		// サイズを代入
 		pWarning->m_size = size;
@@ -52,7 +48,7 @@ CWarning * CWarning::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CWarning::CWarning()
+CWarning::CWarning() : CScene2D(TYPE_WARNING)
 {
 	m_fScale = 2.0f;
 	m_fScaleNum = 0.0f;
@@ -118,39 +114,6 @@ void CWarning::Draw(void)
 }
 
 //====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CWarning::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/WARNING.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CWarning::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_WARNING_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//====================================================================
 // 縮小
 //====================================================================
 void CWarning::ScaleDown(void)
@@ -162,7 +125,7 @@ void CWarning::ScaleDown(void)
 
 		// サイズの設定
 		D3DXVECTOR3 size = D3DXVECTOR3(m_size.x * m_fScale, m_size.y * m_fScale, 0.0f);
-		SetSize2D(size);
+		SetSize(size);
 	}
 	else
 	{

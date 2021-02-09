@@ -14,11 +14,12 @@
 #include "manager.h"
 #include "renderer.h"
 #include <stdio.h>
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define SAVE_FILENAME "date/TEXT/Ranking.txt"		// ファイル名
+#define SAVE_FILENAME "data/TEXT/Ranking.txt"		// ファイル名
 #define RANKING_INTERVAL_X	(55.0f)					// 数字の間隔
 #define RANKING_INTERVAL_Y	(100.0f)				// 数字の間隔
 
@@ -49,7 +50,7 @@ CRanking * CRanking::Create(void)
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CRanking::CRanking()
+CRanking::CRanking(TYPE Priority):CScene(Priority)
 {
 	// 0クリア
 	memset(m_apRanking, 0, sizeof(m_apRanking));
@@ -86,6 +87,8 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 					D3DXVECTOR3(pos.x - nCount*RANKING_INTERVAL_X, 
 						pos.y + nCntRank*RANKING_INTERVAL_Y, 0.0f),
 					size, type, CNumber::NUMBER_TYPE_RANKING);
+
+			m_apRanking[nCntRank][nCount]->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_NUMBER_001));
 
 			if (m_apRanking[nCntRank][nCount] != NULL)
 			{
@@ -126,6 +129,8 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 				D3DXVECTOR3(1170.0f - nCount*RANKING_INTERVAL_X, 660.0f, 0.0f), 
 				D3DXVECTOR3(MY_RANKING_SIZE_X, MY_RANKING_SIZE_Y, 0.0f),
 				type, CNumber::NUMBER_TYPE_RANKING);
+
+			m_apMyRanking[nCount]->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_NUMBER_001));
 
 			if (m_apMyRanking[nCount] != NULL)
 			{

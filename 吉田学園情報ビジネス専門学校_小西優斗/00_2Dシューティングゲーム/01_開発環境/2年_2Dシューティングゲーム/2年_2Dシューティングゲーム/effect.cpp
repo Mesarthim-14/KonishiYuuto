@@ -13,16 +13,12 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define EFFECT_LIFE			(4)			// エフェクトの体力
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CEffect::m_apTexture[MAX_EFFECT_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -40,49 +36,16 @@ CEffect * CEffect::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move,
 		pEffect->SetMove(move);					// 移動量
 		pEffect->SetColor(Ctype);				// 色の種類
 		pEffect->InitColor();					// 色の初期化
-		pEffect->BindTexture(m_apTexture[0]);	// テクスチャ設定
+		pEffect->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));	// テクスチャ設定
 	}
 	
 	return pEffect;
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CEffect::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CEffect::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_EFFECT_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CEffect::CEffect()
+CEffect::CEffect(TYPE Priority) : CScene2D(Priority)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

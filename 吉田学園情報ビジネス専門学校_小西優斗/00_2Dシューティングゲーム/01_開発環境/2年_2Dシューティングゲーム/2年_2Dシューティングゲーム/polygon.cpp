@@ -20,7 +20,7 @@
 //=====================================================
 // コンストラクタ
 //=====================================================
-CPolygon::CPolygon()
+CPolygon::CPolygon(TYPE Priority):CScene(Priority)
 {
 	m_pVtxBuff = NULL;	// 頂点バッファのポインタ
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -42,7 +42,7 @@ CPolygon * CPolygon::Create( D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	CPolygon *pPolygon = NULL;
 
 	//メモリの確保
-	pPolygon = new CPolygon;
+	pPolygon = new CPolygon(type);
 
 	//メモリを確保できていたら
 	if (pPolygon != NULL)

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// チュートリアルの処理 [tutorial.cpp]
+// チュートリアルクラス [tutorial.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -11,11 +11,7 @@
 #include "tutorial.h"
 #include "renderer.h"
 #include "manager.h"
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CTutorial::m_apTexture[MAX_TUTORIAL_TEXTURE] = {};
+#include "texture.h"
 
 //====================================================================
 // ポリゴン生成
@@ -31,7 +27,7 @@ CTutorial * CTutorial::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		pTutorial->Init(pos, size, type);
 
 		// テクスチャの設定
-		pTutorial->BindTexture(m_apTexture[0]);
+		pTutorial->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_TUTORIAL));
 	}
 	return pTutorial;
 }
@@ -39,7 +35,7 @@ CTutorial * CTutorial::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CTutorial::CTutorial()
+CTutorial::CTutorial() : CScene2D(TYPE_UI)
 {
 
 }
@@ -69,6 +65,7 @@ void CTutorial::Uninit(void)
 {
 	// 終了処理
 	CScene2D::Uninit();
+	Release();
 }
 
 //====================================================================
@@ -87,38 +84,4 @@ void CTutorial::Draw(void)
 {
 	// 描画処理
 	CScene2D::Draw();
-
-}
-
-//====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CTutorial::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/tutorial.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CTutorial::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_TUTORIAL_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }

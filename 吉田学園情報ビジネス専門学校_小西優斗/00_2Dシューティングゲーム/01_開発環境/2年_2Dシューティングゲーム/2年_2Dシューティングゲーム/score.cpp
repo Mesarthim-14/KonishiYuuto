@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "number.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -21,7 +22,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CScore::CScore()
+CScore::CScore(TYPE Priority) :CScene(Priority)
 {
 	m_nScore = 0;
 }
@@ -43,6 +44,7 @@ HRESULT CScore::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	{
 		// 数字のメモリ確保
 		m_apNumber[nCount] = CNumber::Create(pos, size, type, CNumber::NUMBER_TYPE_SCORE);
+		m_apNumber[nCount]->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_NUMBER_000));
 
 		if (m_apNumber[nCount] != NULL)
 		{
@@ -67,6 +69,7 @@ void CScore::Uninit(void)
 		if (m_apNumber[nCount] != NULL)
 		{
 			m_apNumber[nCount]->Uninit();
+			m_apNumber[nCount] = NULL;
 		}
 	}
 	// メモリの開放処理

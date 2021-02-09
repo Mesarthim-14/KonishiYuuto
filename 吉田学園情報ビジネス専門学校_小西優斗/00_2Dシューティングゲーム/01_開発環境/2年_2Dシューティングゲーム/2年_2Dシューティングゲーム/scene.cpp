@@ -16,31 +16,48 @@
 // static初期化
 //=============================================================================
 CScene *CScene::m_apScene[MAX_OBJECT] = {};
+CScene *CScene::m_pTop[TYPE_MAX] = {};
+CScene *CScene::m_pCur[TYPE_MAX] = {};
 int CScene::m_nNumAll = 0;
 int CScene::m_nNumEnemy = 0;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CScene::CScene()
+CScene::CScene(TYPE Priority)
 {
 	// メンバ変数初期化
 	m_nID = 0;
-	m_type = TYPE_NONE;
+	m_type = Priority;
+	m_bDeath = false;
 
-	for (int nCntScene = 0; nCntScene < MAX_OBJECT; nCntScene++)
+	// トップになにも入ってなかったら
+	if (m_pTop[Priority] == NULL)
 	{
-		// それぞれNULLのとき
-		if (m_apScene[nCntScene] == NULL)
-		{
-			// Scene2Dの情報
-			m_apScene[nCntScene] = this;
-			m_nID = nCntScene;
-			// 一体加算
-			m_nNumAll++;
-			break;
-		}
+		m_pTop[Priority] = this;
 	}
+
+	if (m_pCur[Priority] == NULL)
+	{
+		// 現在のやつ取得
+		m_pCur[Priority] = this;
+	}
+
+	m_pCur[Priority]->m_pNext = this;
+
+	// 前のやつ代入
+	if (m_pCur[Priority] == this)
+	{
+		m_pPrev = NULL;
+	}
+	else
+	{
+		m_pPrev = m_pCur[Priority];
+	}
+
+	// 現在のやつ取得
+	m_pCur[Priority] = this;
+	m_pNext = NULL;
 }
 
 //=============================================================================
@@ -56,13 +73,47 @@ CScene::~CScene()
 //=============================================================================
 void CScene::UpdateAll(void)
 {
-	for (int nCntScene = 0; nCntScene < MAX_OBJECT; nCntScene++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
 	{
-		// それぞれNULLのとき
-		if (m_apScene[nCntScene] != NULL)
+		if (m_pTop[nCount] != NULL)
 		{
-			// 更新処理
-			m_apScene[nCntScene]->Update();
+			CScene *pScene = m_pTop[nCount];
+
+			do
+			{
+				CScene *pSceneCur = pScene->m_pNext;
+
+				// 死亡フラグがないとき
+				if (pScene->m_bDeath != true)
+				{
+					// 更新処理
+					pScene->Update();
+				}
+				pScene = pSceneCur;
+
+			} while (pScene != NULL);
+		}
+	}
+
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
+	{
+		if (m_pTop[nCount] != NULL)
+		{
+			CScene *pScene = m_pTop[nCount];
+
+			do
+			{
+				CScene *pSceneCur = pScene->m_pNext;
+
+				if (pScene->m_bDeath == true)
+				{
+					// 死亡フラグの処理
+					pScene->DeathRelease();
+				}
+
+				pScene = pSceneCur;
+
+			} while (pScene != NULL);
 		}
 	}
 }
@@ -72,26 +123,24 @@ void CScene::UpdateAll(void)
 //=============================================================================
 void CScene::DrawAll(void)
 {
-	TYPE type;
-
-	// 優先順位が上のTYPEから描画
-	for (int nCntType = 0; nCntType < TYPE_MAX; nCntType++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
 	{
-		for (int nCntScene = 0; nCntScene < MAX_OBJECT; nCntScene++)
+		if (m_pTop[nCount] != NULL)
 		{
-			// 使われていた時
-			if (m_apScene[nCntScene] != NULL)
+			CScene *pScene = m_pTop[nCount];
+			do
 			{
-				// その番号のタイプを代入
-				type = m_apScene[nCntScene]->GetType();
+				CScene *pSceneCur = pScene->m_pNext;
 
-				// タイプが一致したら
-				if (type == nCntType)
+				// 死亡フラグがない時
+				if (pScene->m_bDeath != true)
 				{
-					// 描画処理
-					m_apScene[nCntScene]->Draw();
+					pScene->Draw();
 				}
-			}
+
+				pScene = pSceneCur;
+
+			} while (pScene != NULL);
 		}
 	}
 }
@@ -101,47 +150,47 @@ void CScene::DrawAll(void)
 //=============================================================================
 void CScene::ReleaseAll(void)
 {
-		for (int nCntScene = 0; nCntScene < MAX_OBJECT; nCntScene++)
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
+	{
+		CScene *pScene = m_pTop[nCount];
+		while (pScene != NULL)
 		{
-			// それぞれNULLのとき
-			if (m_apScene[nCntScene] != NULL)
+			CScene *pCurScene = pScene->m_pNext;
+
+			if (nCount != TYPE_FADE)
 			{
-				TYPE type = m_apScene[nCntScene]->GetType();
-
-				if (type != TYPE_FADE)
-				{
-					// 終了処理
-					m_apScene[nCntScene]->Uninit();
-				}
+				pScene->Uninit();
 			}
-		}
 
-		for (int nCntScene = 0; nCntScene < MAX_OBJECT; nCntScene++)
+			pScene = pCurScene;
+		}
+	}
+
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
+	{
+		if (m_pTop[nCount] != NULL)
 		{
-			// それぞれNULLのとき
-			if (m_apScene[nCntScene] != NULL)
+			CScene *pScene = m_pTop[nCount];
+			do
 			{
-				TYPE type = m_apScene[nCntScene]->GetType();
+				CScene *pSceneCur = pScene->m_pNext;
 
-				if (type != TYPE_FADE)
+				if (pScene->m_bDeath == true)
 				{
-					// メモリ開放
-		//			delete[] * m_apScene;
-					m_apScene[nCntScene] = NULL;
+					if (nCount != TYPE_FADE)
+					{
+						pScene->DeathRelease();
+					}
 				}
-			}
+
+				pScene = pSceneCur;
+
+			} while (pScene != NULL);
 		}
+	}
 
 	// エネミーの総数をリセット
 	m_nNumEnemy = 0;
-}
-
-//=============================================================================
-// シーン情報を返す
-//=============================================================================
-CScene * CScene::GetScene(int nCount)
-{
-	return m_apScene[nCount];
 }
 
 //=============================================================================
@@ -149,35 +198,8 @@ CScene * CScene::GetScene(int nCount)
 //=============================================================================
 void CScene::Release()
 {
-	if (m_apScene[m_nID] != NULL)
-	{
-		TYPE type;
-		int nID = m_nID;
-
-		// その番号のタイプを代入
-		type = m_apScene[m_nID]->GetType();
-
-		// 現在の番号のメモリを開放
-		delete m_apScene[nID];
-		m_apScene[nID] = NULL;
-
-		// 総数を減算
-		m_nNumAll--;
-
-		// エネミーだったら減算
-		if (type == TYPE_ENEMY)
-		{
-			m_nNumEnemy--;
-		}
-	}
-}
-
-//=============================================================================
-// エネミーのカウント
-//=============================================================================
-void CScene::CountEnemy()
-{
-	m_nNumEnemy++;
+	// 死亡フラグ
+	m_bDeath = true;
 }
 
 //=============================================================================
@@ -189,7 +211,64 @@ void CScene::SetType(TYPE type)
 }
 
 //=============================================================================
-// タイプ情報
+// エネミーのカウント関数
+//=============================================================================
+void CScene::CountEnemy()
+{
+	m_nNumEnemy++;
+}
+
+//=============================================================================
+// 死亡フラグを持ったやつのリリース
+//=============================================================================
+void CScene::DeathRelease(void)
+{
+	// 位置をずらす
+	for (int nCount = 0; nCount < TYPE_MAX; nCount++)
+	{
+		// 先頭だったら
+		if (m_pTop[nCount] == this)
+		{
+			// 先頭を次のオブジェクトにする
+			m_pTop[nCount] = m_pNext;
+		}
+
+		// 最後だったら
+		if (m_pCur[nCount] == this)
+		{
+			// 最後をその前のオブジェクトにする
+			m_pCur[nCount] = m_pPrev;
+		}
+
+		if (m_pPrev != NULL)
+		{
+			m_pPrev->m_pNext = m_pNext;
+		}
+		if (m_pNext != NULL)
+		{
+			m_pNext->m_pPrev = m_pPrev;
+		}
+	}
+
+	// エネミーだったら減算
+	if (m_type == TYPE_ENEMY)
+	{
+		m_nNumEnemy--;
+	}
+
+	delete this;
+}
+
+//=============================================================================
+// エネミーの数情報
+//=============================================================================
+int CScene::GetEnemyNum(void)
+{
+	return m_nNumEnemy;
+}
+
+//=============================================================================
+// 種類の情報
 //=============================================================================
 CScene::TYPE CScene::GetType(void)
 {
@@ -197,9 +276,17 @@ CScene::TYPE CScene::GetType(void)
 }
 
 //=============================================================================
-// エネミー数の情報
+// シーン情報を返す
 //=============================================================================
-int CScene::GetEnemyNum(void)
+CScene * CScene::GetTop(int nCount)
 {
-	return m_nNumEnemy;
+	return m_pTop[nCount];
+}
+
+//=============================================================================
+// 次のシーン情報
+//=============================================================================
+CScene * CScene::GetNext(void)
+{
+	return m_pNext;
 }

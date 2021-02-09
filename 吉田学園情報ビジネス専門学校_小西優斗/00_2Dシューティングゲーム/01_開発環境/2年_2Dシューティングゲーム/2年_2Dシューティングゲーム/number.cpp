@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ナンバーヘッダー [number.cpp]
+// ナンバークラス [number.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -22,7 +22,6 @@
 //=============================================================================
 // static初期化
 //=============================================================================
-LPDIRECT3DTEXTURE9 CNumber::m_apTexture[MAX_NUMBER_TEXTURE] = {};
 LPDIRECT3DDEVICE9 CNumber::m_pDevice = NULL;
 
 //=============================================================================
@@ -46,56 +45,20 @@ CNumber * CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, CScene::TYPE type, 
 //=============================================================================
 // テクスチャの設定
 //=============================================================================
-void CNumber::BindTexture(LPDIRECT3DTEXTURE9 pTexture)
+void CNumber::BindTexture(const LPDIRECT3DTEXTURE9 pTexture)
 {
-	m_apTexture[0] = pTexture;
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CNumber::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/number.png",
-		&m_apTexture[0]);
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Number010.png",
-		&m_apTexture[1]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CNumber::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_NUMBER_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}	
+	m_pTexture = pTexture;
 }
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CNumber::CNumber()
+CNumber::CNumber(TYPE Priority) : CScene(Priority)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_pVtxBuff = NULL;
+	m_pTexture = NULL;
 }
 
 //=============================================================================
@@ -176,6 +139,9 @@ void CNumber::Uninit(void)
 		m_pVtxBuff->Release();
 		m_pVtxBuff = NULL;
 	}
+
+	// 終了フラグ
+	Release();
 }
 
 //=============================================================================
@@ -191,39 +157,22 @@ void CNumber::Update(void)
 //=============================================================================
 void CNumber::Draw(void)
 {
-		// 頂点バッファをデバイスのデータストリームにバインド
-		m_pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
+	// 頂点バッファをデバイスのデータストリームにバインド
+	m_pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
 
-		// 頂点フォーマットの設定
-		m_pDevice->SetFVF(FVF_VERTEX_2D);
+	// 頂点フォーマットの設定
+	m_pDevice->SetFVF(FVF_VERTEX_2D);
 
-		// ナンバーの種類
-		switch (m_Ntype)
-		{
-			// スコア
-		case NUMBER_TYPE_SCORE:
-			// テクスチャの設定
-			m_pDevice->SetTexture(0, m_apTexture[0]);
-			break;
+	m_pDevice->SetTexture(0, m_pTexture);
 
-			// ランキング
-		case NUMBER_TYPE_RANKING:
-			// テクスチャの設定
-			m_pDevice->SetTexture(0, m_apTexture[1]);
-			break;
+	// ポリゴンの描画
+	m_pDevice->DrawPrimitive(
+		D3DPT_TRIANGLESTRIP,		// プリミティブの種類
+		0,
+		NUM_POLYGON);				// プリミティブの数
 
-			// その他
-		default:
-			// テクスチャの設定
-			m_pDevice->SetTexture(0, m_apTexture[0]);
-			break;
-		}
-
-		// ポリゴンの描画
-		m_pDevice->DrawPrimitive(
-			D3DPT_TRIANGLESTRIP,		// プリミティブの種類
-			0,
-			NUM_POLYGON);				// プリミティブの数
+	// テクスチャの設定
+	m_pDevice->SetTexture(0, NULL);
 }
 
 //=============================================================================

@@ -162,14 +162,14 @@ HRESULT CSound::Init(HWND hWnd)
 
 		// オーディオバッファの登録
 		m_apSourceVoice[nCntSound]->SubmitSourceBuffer(&buffer);
-
+		m_apSourceVoice[nCntSound]->SetVolume(0.1f);
 		// ファイルをクローズ
 		CloseHandle(hFile);
 	}
 
-	m_apSourceVoice[SOUND_LABEL_BUTTON]->SetVolume(3.0f);
-	m_apSourceVoice[SOUND_LABEL_SHOT]->SetVolume(3.0f);
-	m_apSourceVoice[SOUND_LABEL_LASER]->SetVolume(5.0f);
+//	m_apSourceVoice[SOUND_LABEL_BUTTON]->SetVolume(3.0f);
+//	m_apSourceVoice[SOUND_LABEL_SHOT]->SetVolume(3.0f);
+//	m_apSourceVoice[SOUND_LABEL_LASER]->SetVolume(5.0f);
 
 //	m_apSourceVoice[~~~~]->Setvolume(0.7f);
 	return S_OK;

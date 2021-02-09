@@ -1,6 +1,5 @@
 #ifndef _SHIELD_H_
 #define _SHIELD_H_
-
 //=============================================================================
 //
 // シールドクラスヘッダー	[shield.h]
@@ -20,7 +19,6 @@
 #define SHIELD_SIZE_Y			(94)	// サイズ
 #define SHIELD_ANIM_SPEED		(5)		// アニメーションの速度
 #define SHIELD_ANIM_PATTERN		(8)		// アニメーションのパターン
-#define MAX_SHILD_TEXTURE		(2)		// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -54,12 +52,9 @@ public:
 
 	void SetMove(D3DXVECTOR3 move);								// 移動量設定
 	bool GetbScale(void);										// バリアの大きさ情報
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 private:
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_move;											// 移動量
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_SHILD_TEXTURE];	// テクスチャ情報のポインタ
 	bool m_bScaleUp;											// 拡大終わりフラグ
 };
 

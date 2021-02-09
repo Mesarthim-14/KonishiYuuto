@@ -13,15 +13,11 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CSpark::m_apTexture[MAX_SPARK_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -56,49 +52,16 @@ CSpark * CSpark::Create(D3DXVECTOR3 pos,
 		pSpark->InitColor();
 
 		// テクスチャ設定
-		pSpark->BindTexture(m_apTexture[0]);
+		pSpark->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));
 		pSpark->m_nLife = nLife - rand() % 20;
 	}
 	return pSpark;
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CSpark::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CSpark::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_SPARK_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CSpark::CSpark()
+CSpark::CSpark() : CEffect(TYPE_EFFECT)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

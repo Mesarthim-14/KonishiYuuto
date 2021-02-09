@@ -49,14 +49,15 @@ public:
 		TYPE_SURROUNDINGS,		// ボスの取り巻き
 		TYPE_EXPLOSION,			// 爆発
 		TYPE_UI,				// 画面の仕切り
+		TYPE_BOMB,					// ボム
 		TYPE_SCORE,				// スコア
 		TYPE_WARNING,			// 警告
-		TYPE_FADE,				// フェードの優先
+		TYPE_FADE,				// フェード
 		TYPE_MAX
 	}TYPE;
 
-	CScene();				// コンストラクタ
-	virtual ~CScene();		// デストラクタ
+	CScene(TYPE Priority = TYPE_NONE);	// コンストラクタ
+	virtual ~CScene();					// デストラクタ
 
 	// メンバ関数
 	virtual HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type) = 0;	// 初期化処理
@@ -67,21 +68,29 @@ public:
 	static void UpdateAll(void);			// 全てのオブジェクトを更新
 	static void DrawAll(void);				// 全てのオブジェクトを描画
 	static void ReleaseAll(void);			// 全てのオブジェクトを開放する
-	CScene *GetScene(int nCount);			// シーンの情報受け取り
+	CScene *GetTop(int nCount);				// シーンの情報受け取り
+	CScene *GetNext(void);					// 次の情報を受け取る
 	void SetType(TYPE type);				// シーンの情報設定
 	TYPE GetType(void);						// シーン情報を返す
-	static int GetEnemyNum(void);			// 敵の数の情報
-	static void CountEnemy(void);			// 敵のカウント
-	
+	static int GetEnemyNum(void);
+	static void CountEnemy();
+	void DeathRelease(void);
+
 protected:
 	void Release(void);						// オブジェクトを開放
 
 private:
 	static CScene *m_apScene[MAX_OBJECT];	// シーンオブジェクトの情報
-	static int m_nNumEnemy;					// エネミーの数
+	static int m_nNumEnemy;
 	static int m_nNumAll;					// 使用してる数
 	TYPE m_type;							// オブジェクトのタイプ
 	int m_nID;								// オブジェクトの番号
+
+	static CScene *m_pTop[TYPE_MAX];		// 戦闘のオブジェクトへのポインタ
+	static CScene *m_pCur[TYPE_MAX];		// 現在のオブジェクトへのポインタ
+	CScene *m_pPrev;						// 前のオブジェクトへのポインタ
+	CScene *m_pNext;						// 次のオブジェクトへのポインタ
+	bool m_bDeath;							// 死亡フラグ
 };
 
 #endif

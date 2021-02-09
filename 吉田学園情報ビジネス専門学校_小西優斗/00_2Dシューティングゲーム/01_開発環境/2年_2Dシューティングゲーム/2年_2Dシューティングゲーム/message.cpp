@@ -11,17 +11,13 @@
 #include "message.h"
 #include "renderer.h"
 #include "manager.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define MESSAGE_SCALE_UP_NUM		(0.1f)		// 拡大の値
 #define MESSAGE_USE_TIME			(210)		// メッセージの出現時間
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CMessage::m_apTexture[MAX_MESSAGE_TEXTURE] = {};
 
 //====================================================================
 // ポリゴン生成
@@ -37,7 +33,7 @@ CMessage * CMessage::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		pMessage->Init(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), type);
 
 		// テクスチャの設定
-		pMessage->BindTexture(m_apTexture[0]);
+		pMessage->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_MESSAGE));
 
 		// サイズを代入
 		pMessage->m_size = size;
@@ -48,7 +44,7 @@ CMessage * CMessage::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CMessage::CMessage()
+CMessage::CMessage() : CScene2D(TYPE_UI)
 {
 	m_fScale = 0.0f;
 	m_fScaleNum = 0.0f;
@@ -121,39 +117,6 @@ void CMessage::Draw(void)
 }
 
 //====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CMessage::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/message000.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CMessage::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_MESSAGE_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//====================================================================
 // 拡大
 //====================================================================
 void CMessage::ScaleUp(void)
@@ -166,7 +129,7 @@ void CMessage::ScaleUp(void)
 		D3DXVECTOR3 size = D3DXVECTOR3(m_size.x * m_fScale, m_size.y * m_fScale, 0.0f);
 
 		// Scene2Dにサイズを渡す
-		SetSize2D(size);
+		SetSize(size);
 	}
 	else
 	{
@@ -187,7 +150,7 @@ void CMessage::ScaleDown(void)
 		D3DXVECTOR3 size = D3DXVECTOR3(m_size.x * m_fScale, m_size.y * m_fScale, 0.0f);
 
 		// Scene2Dにサイズを渡す
-		SetSize2D(size);
+		SetSize(size);
 	}
 	else
 	{

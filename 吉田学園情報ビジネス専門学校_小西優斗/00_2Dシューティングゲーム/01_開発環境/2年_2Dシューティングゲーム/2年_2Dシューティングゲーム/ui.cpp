@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// UI処理 [ui.cpp]
+// UIクラス [ui.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -12,11 +12,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "sound.h"
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CUi::m_apTexture[MAX_UI_TEXTURE] = {};
+#include "texture.h"
 
 //=============================================================================
 // インスタンス生成
@@ -35,18 +31,18 @@ CUi * CUi::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, UI_TYPE Utype)
 		{
 		case UI_TYPE_WALL:
 			// テクスチャ
-			pUi->BindTexture(m_apTexture[0]);
+			pUi->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_UI_WALL));
 			break;
 
 		case UI_TYPE_WAKU:
 			// テクスチャ
-			pUi->BindTexture(m_apTexture[1]);
+			pUi->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_UI_WAKU));
 			pUi->InitScroll(1, 0.04f);
 			break;
 
 		case UI_TYPE_REMAIN:
 			// テクスチャ
-			pUi->BindTexture(m_apTexture[2]);
+			pUi->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_UI_REMAIN));
 			break;
 		}
 	}
@@ -54,46 +50,9 @@ CUi * CUi::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, UI_TYPE Utype)
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CUi::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/wall000.jpg",
-		&m_apTexture[0]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/bg_waku.png",
-		&m_apTexture[1]);
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/remain000.png",
-		&m_apTexture[2]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CUi::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_UI_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CUi::CUi()
+CUi::CUi(TYPE Priority) : CScene2D(Priority)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -126,6 +85,8 @@ void CUi::Uninit(void)
 {
 	// 2Dポリゴン終了処理
 	CScene2D::Uninit();
+
+	Release();
 }
 
 //=============================================================================

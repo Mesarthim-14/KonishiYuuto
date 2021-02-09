@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// 爆発処理 [explosion.cpp]
+// 爆発クラス [explosion.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -13,16 +13,12 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CExplosion::m_apTexture[MAX_EXPLOSION_TEXTURE] = {};
+#include "texture.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CExplosion::CExplosion()
+CExplosion::CExplosion() :CScene2D(TYPE_EXPLOSION)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -80,7 +76,7 @@ void CExplosion::Uninit(void)
 void CExplosion::Update(void)
 {
 	// 現在の位置を取得
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	m_Pos += m_move;
 
@@ -119,19 +115,19 @@ CExplosion * CExplosion::Create(D3DXVECTOR3 pos,  D3DXVECTOR3 move, D3DXVECTOR3 
 		// 白いとき
 	case COLOR_TYPE_WHITE:
 		// テクスチャ設定
-		pExplosion->BindTexture(m_apTexture[0]);
+		pExplosion->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EXPLOSION_000));
 		break;
 
 		// 黒いとき
 	case COLOR_TYPE_BLACK:
 		// テクスチャ設定
-		pExplosion->BindTexture(m_apTexture[1]);
+		pExplosion->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EXPLOSION_001));
 		break;
 
 		// ボスの時
 	case COLOR_TYPE_BOSS:
 		// テクスチャ設定
-		pExplosion->BindTexture(m_apTexture[2]);
+		pExplosion->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EXPLOSION_002));
 		break;
 	}
 
@@ -145,43 +141,4 @@ void CExplosion::SetExplosion(D3DXVECTOR3 move, COLOR_TYPE Ctype)
 {
 	m_move = move;
 	m_Ctype = Ctype;
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CExplosion::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Explosion002.png",
-		&m_apTexture[0]);		
-
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Explosion001.png",
-		&m_apTexture[1]);
-
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/Explosion100.png",
-		&m_apTexture[2]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CExplosion::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_EXPLOSION_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
 }

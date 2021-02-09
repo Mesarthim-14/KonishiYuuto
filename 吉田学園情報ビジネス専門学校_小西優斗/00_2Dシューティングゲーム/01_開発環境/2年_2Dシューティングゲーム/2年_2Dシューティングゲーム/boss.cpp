@@ -23,6 +23,7 @@
 #include "score.h"
 #include "game.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -72,7 +73,6 @@
 //=============================================================================
 // static初期化
 //=============================================================================
-LPDIRECT3DTEXTURE9 CBoss::m_apTexture[MAX_BOSS_TEXTURE] = {};
 
 //=============================================================================
 // ポリゴン生成
@@ -88,7 +88,7 @@ CBoss * CBoss::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		pBoss->Init(pos, size, type);
 
 		// テクスチャ設定
-		pBoss->BindTexture(m_apTexture[0]);
+		pBoss->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_BOSS));
 
 		// 初期移動量
 		pBoss->AppearanceMove();
@@ -106,10 +106,18 @@ CBoss * CBoss::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	return pBoss;
 }
 
+void CBoss::MoveUpdate(void)
+{
+}
+
+void CBoss::BulletUpdate(void)
+{
+}
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CBoss::CBoss()
+CBoss::CBoss() : CEnemy(TYPE_BOSS)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -118,7 +126,7 @@ CBoss::CBoss()
 	m_nBulletCnt = 0;
 	m_nBossPhases = 0;
 	m_bColorFlag = true;
-	m_State = ENEMY_STATE_NORMAL;
+	m_State = STATE_NORMAL;
 	m_nStateCnt = 0;
 	pHpbar = NULL;
 	m_nFlashFlame = 0;
@@ -173,7 +181,7 @@ void CBoss::Update(void)
 	CScene2D::Update();
 
 	// 座標更新
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	// 移動の更新
 	m_Pos += m_Move;
@@ -182,11 +190,11 @@ void CBoss::Update(void)
 	switch (m_State)
 	{
 		// 通常時
-	case ENEMY_STATE_NORMAL:
+	case STATE_NORMAL:
 		break;
 
 	// ダメージを受けたとき
-	case ENEMY_STATE_DAMAGE:
+	case STATE_DAMAGE:
 
 		// フレームカウント
 		m_nStateCnt++;
@@ -212,7 +220,7 @@ void CBoss::Update(void)
 		if (m_nStateCnt >= BOSS_ARMOR_TIME)
 		{
 			// 状態を戻す
-			m_State = ENEMY_STATE_NORMAL;
+			m_State = STATE_NORMAL;
 
 			// 頂点カラーの設定
 			pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);	// 左上頂点の色	透明度255
@@ -367,7 +375,7 @@ void CBoss::HitBossDamage(int nNumber)
 		else
 		{
 			// ダメージ状態にする
-			m_State = ENEMY_STATE_DAMAGE;
+			m_State = STATE_DAMAGE;
 		}
 	}
 }
@@ -975,39 +983,6 @@ void CBoss::ExplosionPhase(void)
 	if (m_nExplosionCount >= BOSS_EXPLOSION_COUNT)
 	{
 		m_bBossEnd = true;
-	}
-}
-
-//=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CBoss::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/enemy_boss.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CBoss::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_BOSS_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
 	}
 }
 

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ゲームモードの処理 [game.cpp]
+// ゲームクラス [game.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -29,6 +29,14 @@
 #include "ranking.h"
 #include "time.h"
 #include "tutorial.h"
+#include "enemy_circle.h"
+#include "enemy_current.h"
+#include "enemy_direction.h"
+#include "enemy_follow.h"
+#include "enemy_normal.h"
+#include "enemy_rotation.h"
+#include "enemy_snake.h"
+#include "enemy_through.h"
 
 //=============================================================================
 // static初期化
@@ -269,7 +277,7 @@ void CGame::SetGame(void)
 			// 最初の出現
 			for (int nCount = 0; nCount < 5; nCount++)
 			{
-				CEnemy::Create(
+				CEnemyNormal::Create(
 					D3DXVECTOR3(WALL_SIZE_X + 50.0f, 0.0f - (nCount * 60), 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -284,7 +292,7 @@ void CGame::SetGame(void)
 			// 二回目の出現
 			for (int nCount = 0; nCount < 5; nCount++)
 			{
-				CEnemy::Create(
+				CEnemyNormal::Create(
 					D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 50.0f, 0.0f - (nCount * 60), 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -297,7 +305,7 @@ void CGame::SetGame(void)
 		case 300:
 			for (int nCount = 0; nCount < 5; nCount++)
 			{
-				CEnemy::Create(
+				CEnemyNormal::Create(
 					D3DXVECTOR3(WALL_SIZE_X + 50.0f, 0.0f - (nCount * 60), 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -309,7 +317,7 @@ void CGame::SetGame(void)
 
 			for (int nCount = 0; nCount < 5; nCount++)
 			{
-				CEnemy::Create(
+				CEnemyNormal::Create(
 					D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 50.0f, 0.0f - (nCount * 60), 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -326,7 +334,7 @@ void CGame::SetGame(void)
 				// ジグザグ出現
 				for (int nCount = 0; nCount < 3; nCount++)
 				{
-					CEnemy::Create(
+					CEnemySnake::Create(
 						D3DXVECTOR3(WALL_SIZE_X + 75.0f + (nCount * 75), 0.0f - (nCntSnake * 40), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_SNAKE_SIZE_X, ENEMY_SNAKE_SIZE_Y, 0.0f),
@@ -336,7 +344,7 @@ void CGame::SetGame(void)
 				}
 				for (int nCount = 0; nCount < 3; nCount++)
 				{
-					CEnemy::Create(
+					CEnemySnake::Create(
 						D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 85.0f - (nCount * 75), 0.0f - (nCntSnake * 40), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_SNAKE_SIZE_X, ENEMY_SNAKE_SIZE_Y, 0.0f),
@@ -383,7 +391,7 @@ void CGame::SetGame(void)
 		case 40:
 			for (int nCount = 0; nCount < CIRCLE_ENEMY_NUM; nCount++)
 			{
-				CEnemy::Circle(D3DXVECTOR3(
+				CEnemyCircle::Create(D3DXVECTOR3(
 					WALL_SIZE_X + CIRCLE_DISTANCE*cosf(D3DXToRadian(CIRCLE_ANGLE + (nCount * CIRCLE_MAX_ANGLE / CIRCLE_ENEMY_NUM))),
 					CIRCLE_INITIAL_Y + CIRCLE_DISTANCE*sinf(D3DXToRadian(CIRCLE_ANGLE + (nCount * CIRCLE_MAX_ANGLE / CIRCLE_ENEMY_NUM))), 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -397,7 +405,7 @@ void CGame::SetGame(void)
 		case 210:
 			for (int nCount = 0; nCount < CIRCLE_ENEMY_NUM; nCount++)
 			{
-				CEnemy::Circle(D3DXVECTOR3(
+				CEnemyCircle::Create(D3DXVECTOR3(
 					SCREEN_WIDTH - WALL_SIZE_X - CIRCLE_DISTANCE*cosf(D3DXToRadian(-CIRCLE_ANGLE + (nCount * CIRCLE_MAX_ANGLE / CIRCLE_ENEMY_NUM))),
 					CIRCLE_INITIAL_Y + CIRCLE_DISTANCE*sinf(D3DXToRadian(-CIRCLE_ANGLE + (nCount * CIRCLE_MAX_ANGLE / CIRCLE_ENEMY_NUM))), 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -414,7 +422,7 @@ void CGame::SetGame(void)
 			{
 				if (nChange % 2 == 0)
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 85.0f - ((float)nCount * 50.0f), 0.0f, 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -425,7 +433,7 @@ void CGame::SetGame(void)
 				}
 				else
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 85.0f - ((float)nCount * 50.0f), 0.0f + (nCount * 60), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -442,7 +450,7 @@ void CGame::SetGame(void)
 			{
 				if (nChange % 2 == 0)
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(WALL_SIZE_X + 175.0f - ((float)nCount * 50.0f), 0.0f, 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -453,7 +461,7 @@ void CGame::SetGame(void)
 				}
 				else
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(WALL_SIZE_X + 175.0f - ((float)nCount * 50.0f), 0.0f + (nCount * 60), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -471,7 +479,7 @@ void CGame::SetGame(void)
 			{
 				if (nChange % 2 == 0)
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 85.0f - ((float)nCount * 50.0f), 0.0f, 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -482,7 +490,7 @@ void CGame::SetGame(void)
 				}
 				else
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 85.0f - ((float)nCount * 50.0f), 0.0f + (nCount * 60), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -500,7 +508,7 @@ void CGame::SetGame(void)
 			{
 				if (nChange % 2 == 0)
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(WALL_SIZE_X + 175.0f - ((float)nCount * 50.0f), 0.0f, 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -511,7 +519,7 @@ void CGame::SetGame(void)
 				}
 				else
 				{
-					CEnemy::Create(
+					CEnemyCurrent::Create(
 						D3DXVECTOR3(WALL_SIZE_X + 175.0f - ((float)nCount * 50.0f), 0.0f + (nCount * 60), 0.0f),
 						D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 						D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -525,7 +533,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 900:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -535,7 +543,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 940:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(WALL_SIZE_X + 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -545,7 +553,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 980:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -555,7 +563,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1020:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(WALL_SIZE_X + 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -565,7 +573,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1060:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -575,7 +583,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1100:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(WALL_SIZE_X + 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -585,7 +593,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1140:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -595,7 +603,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1180:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(WALL_SIZE_X + 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -605,7 +613,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1220:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -615,7 +623,7 @@ void CGame::SetGame(void)
 			break;
 
 		case 1260:
-			CEnemy::Create(
+			CEnemyThrough::Create(
 				D3DXVECTOR3(WALL_SIZE_X + 75.0f, 0.0f, 0.0f),
 				D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 				D3DXVECTOR3(ENEMY_CURRENT_SIZE_X, ENEMY_CURRENT_SIZE_Y, 0.0f),
@@ -627,7 +635,7 @@ void CGame::SetGame(void)
 		case 1400:
 			for (int nCount = 0; nCount < 10; nCount++)
 			{
-				CEnemy::Rotation(
+				CEnemyRotation::Create(
 					D3DXVECTOR3(600.0f, 500.0f, 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -638,7 +646,7 @@ void CGame::SetGame(void)
 			}
 			for (int nCount = 0; nCount < 10; nCount++)
 			{
-				CEnemy::Rotation(
+				CEnemyRotation::Create(
 					D3DXVECTOR3(600.0f, 500.0f, 0.0f),
 					D3DXVECTOR3(0.0f, 1.5f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
@@ -652,7 +660,7 @@ void CGame::SetGame(void)
 		case 1800:
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(WALL_SIZE_X + 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 0);
@@ -662,7 +670,7 @@ void CGame::SetGame(void)
 			}
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 1);
@@ -675,7 +683,7 @@ void CGame::SetGame(void)
 		case 1900:
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(WALL_SIZE_X + 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 0);
@@ -685,7 +693,7 @@ void CGame::SetGame(void)
 			}
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 1);
@@ -701,7 +709,7 @@ void CGame::SetGame(void)
 
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(WALL_SIZE_X + 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 0);
@@ -711,7 +719,7 @@ void CGame::SetGame(void)
 			}
 			for (int nCount = 0; nCount < 3; nCount++)
 			{
-				CEnemy::Direction(
+				CEnemyDirection::Create(
 					D3DXVECTOR3(SCREEN_WIDTH - WALL_SIZE_X - 75.0f, -10.0f - nCount*100.0f, 0.0f),
 					D3DXVECTOR3(ENEMY_NORMAL_SIZE_X, ENEMY_NORMAL_SIZE_Y, 0.0f),
 					CScene::TYPE_ENEMY, CEnemy::COLOR_TYPE_WHITE, CEnemy::ENEMY_TYPE_DIRECTION, 1);
@@ -731,7 +739,7 @@ void CGame::SetGame(void)
 					m_bThirdPhaseEnd = true;
 					int nDistance = 450 + (rand() % 300);
 
-					CEnemy::Follow(
+					CEnemyFollow::Create(
 						D3DXVECTOR3(WALL_SIZE_X + nDistance *cosf(D3DXToRadian(0+((m_nCntFollow * 2) * (90 / 30)))),
 						(SCREEN_HEIGHT - 100.0f) - nDistance *sinf(D3DXToRadian(0 + ((m_nCntFollow * 2) * (90 / 30)))),
 						0.0f),
@@ -749,7 +757,7 @@ void CGame::SetGame(void)
 
 					int nAngle = rand() % 90;
 
-					CEnemy::Follow(
+					CEnemyFollow::Create(
 						D3DXVECTOR3(WALL_SIZE_X + nDistance *cosf(D3DXToRadian(nAngle)),
 							(SCREEN_HEIGHT-100.0f) - nDistance *sinf(D3DXToRadian(nAngle)),
 							0.0f),

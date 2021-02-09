@@ -1,6 +1,5 @@
 #ifndef _FLASH_H_
 #define _FLASH_H_
-
 //=============================================================================
 //
 // フラッシュクラスヘッダー [flash.h]
@@ -16,11 +15,10 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define FLASH_SIZE_X			(27)			// サイズ
-#define FLASH_SIZE_Y			(27)			// サイズ
-#define MAX_FLASH_TEXTURE		(1)				// テクスチャの数
-#define FLASH_LIFE				(5)				// ライフ
-#define FLASH_NUM				(30)			// 数
+#define FLASH_SIZE_X			(27)	// サイズ
+#define FLASH_SIZE_Y			(27)	// サイズ
+#define FLASH_LIFE				(5)		// ライフ
+#define FLASH_NUM				(30)	// 数
 
 //=============================================================================
 // 前方宣言
@@ -62,8 +60,6 @@ public:
 		FLASH_COLOR Ctype,  FLASH_TYPE Ftype , int nLife);
 
 	void SetMove(D3DXVECTOR3 move);								// 移動量設定
-	static HRESULT Load(void);									// テクスチャロード
-	static void UnLoad(void);									// テクスチャアンロード
 	void SetColor(FLASH_COLOR Ctype);							// 色の設定
 	void InitColor(void);										// 色の初期化
 	void GetPlayerPos(void);									// プレイヤー情報の取得
@@ -74,7 +70,6 @@ private:
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_move;											// 移動量
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;							// 頂点バッファのポインタ
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_FLASH_TEXTURE];	// テクスチャ情報のポインタ
 	FLASH_COLOR m_Ctype;										// カラータイプ
 	FLASH_TYPE m_Ftype;											// エフェクトタイプ
 	int m_nLife;												// ライフ

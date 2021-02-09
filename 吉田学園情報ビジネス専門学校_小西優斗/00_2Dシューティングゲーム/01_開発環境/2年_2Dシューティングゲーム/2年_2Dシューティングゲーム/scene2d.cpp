@@ -26,12 +26,13 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CScene2D::CScene2D()
+CScene2D::CScene2D(TYPE Priority) : CScene(Priority)
 {
 	m_pTexture = NULL;							// テクスチャのポインタ
 	m_pVtxBuff = NULL;							// 頂点バッファのポインタ
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ポリゴンのサイズ
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ポリゴンの座標
+	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動量
 	m_nCountAnim = 0;							// アニメーションのカウンター
 	m_nCountAnimPattern = 0;					// アニメーションパターンのカウンタ
 	m_nCounterAnim = 0;							// アニメーションの速さ
@@ -129,7 +130,7 @@ void CScene2D::Uninit(void)
 	}
 
 	// シーンリリース
-	CScene::Release();
+	Release();
 }
 
 //=============================================================================
@@ -137,6 +138,10 @@ void CScene2D::Uninit(void)
 //=============================================================================
 void CScene2D::Update(void)
 {
+	m_pos += m_move;
+
+	SetPosition(m_pos);
+
 	// アニメーションの設定がされたとき
 	if (m_nPatternAnim != 0)
 	{
@@ -162,8 +167,10 @@ void CScene2D::Draw(void)
 
 	// 頂点バッファをデバイスのデータストリームにバインド
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
+
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
+
 	// テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
@@ -172,6 +179,9 @@ void CScene2D::Draw(void)
 		D3DPT_TRIANGLESTRIP,		// プリミティブの種類
 		0,
 		NUM_POLYGON);				// プリミティブの数
+
+	// テクスチャの設定
+	pDevice->SetTexture(0, NULL);
 }
 
 //=============================================================================
@@ -200,7 +210,12 @@ void CScene2D::SetPosition(D3DXVECTOR3 pos)
 //=============================================================================
 // サイズの設定
 //=============================================================================
-void CScene2D::SetSize2D(D3DXVECTOR3 size)
+void CScene2D::SetSize(const D3DXVECTOR3 &size)
+{
+	m_size = size;
+}
+
+void CScene2D::SetScaleSize(D3DXVECTOR3 size)
 {
 	m_size = size;
 
@@ -211,46 +226,54 @@ void CScene2D::SetSize2D(D3DXVECTOR3 size)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点座標の設定
-	pVtx[0].pos = D3DXVECTOR3(m_pos.x - m_size.x / 2, m_pos.y - m_size.y / 2, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(m_pos.x + m_size.x / 2, m_pos.y - m_size.y / 2, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(m_pos.x - m_size.x / 2, m_pos.y + m_size.y / 2, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(m_pos.x + m_size.x / 2, m_pos.y + m_size.y / 2, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(m_pos.x - size.x / 2, m_pos.y - size.y / 2, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(m_pos.x + size.x / 2, m_pos.y - size.y / 2, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(m_pos.x - size.x / 2, m_pos.y + size.y / 2, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(m_pos.x + size.x / 2, m_pos.y + size.y / 2, 0.0f);
 
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+
 }
 
 //=============================================================================
 // 位置を返す関数
 //=============================================================================
-D3DXVECTOR3 CScene2D::GetPosition(void)
+D3DXVECTOR3 CScene2D::GetPos(void)
 {
 	return m_pos;
 }
 
 //=============================================================================
+// 移動量の設定関数
+//=============================================================================
+D3DXVECTOR3 CScene2D::GetMove(void)
+{
+	return m_move;
+}
+
+//=============================================================================
 // テクスチャ設定関数
 //=============================================================================
-void CScene2D::BindTexture(LPDIRECT3DTEXTURE9 pTexture)
+void CScene2D::BindTexture(const LPDIRECT3DTEXTURE9 pTexture)
 {
 	m_pTexture = pTexture;
 }
 
 //=============================================================================
-// 初期化時の値代入
+// 座標代入
 //=============================================================================
-void CScene2D::SetPolygon(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+void CScene2D::SetPos(const D3DXVECTOR3 &pos)
 {
-	m_pos = pos;		// ポリゴンのサイズ
-	m_size = size;		// ポリゴンの座標
+	m_pos = pos;
 }
 
 //=============================================================================
-// 座標代入
+// 移動量の設定
 //=============================================================================
-void CScene2D::SetP(D3DXVECTOR3 pos)
+void CScene2D::SetMove(const D3DXVECTOR3 &move)
 {
-	m_pos = pos;
+	m_move = move;
 }
 
 //=============================================
@@ -480,13 +503,18 @@ void CScene2D::UpdateScroll(void)
 //=============================================================================
 LPDIRECT3DVERTEXBUFFER9 CScene2D::GetVtxBuff(void)
 {
-	return m_pVtxBuff;
+	if (m_pVtxBuff != NULL)
+	{
+		return m_pVtxBuff;
+	}
+
+	return nullptr;
 }
 
 //=============================================================================
 // サイズ情報
 //=============================================================================
-D3DXVECTOR3 CScene2D::GetSize2D(void)
+D3DXVECTOR3 CScene2D::GetSize(void)
 {
 	return m_size;
 }

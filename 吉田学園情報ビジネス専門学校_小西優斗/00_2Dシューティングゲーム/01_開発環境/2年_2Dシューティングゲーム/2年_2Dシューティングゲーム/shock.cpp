@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// 衝撃クラス処理 [shock.cpp]
+// 衝撃クラス [shock.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -13,17 +13,13 @@
 #include "manager.h"
 #include "player.h"
 #include "sound.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define SCALE_UP_NUM	(0.08f)
 #define SUB_ALPHA_NUM	(6)
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CShock::m_apTexture[MAX_SHOCK_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -43,12 +39,12 @@ CShock * CShock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, COLOR_TYPE
 	{
 	case COLOR_TYPE_WHITE:
 		// テクスチャ
-		pShock->BindTexture(m_apTexture[0]);
+		pShock->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_SHOCK_000));
 		break;
 
 	case COLOR_TYPE_BLACK:
 		// テクスチャ
-		pShock->BindTexture(m_apTexture[1]);
+		pShock->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_SHOCK_001));
 		break;
 	}
 	return pShock;
@@ -57,7 +53,7 @@ CShock * CShock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, COLOR_TYPE
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CShock::CShock()
+CShock::CShock() : CScene2D(TYPE_EXPLOSION)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -108,7 +104,7 @@ void CShock::Uninit(void)
 void CShock::Update(void)
 {
 	// 現在の位置を取得
-	m_Pos = GetPosition();
+	m_Pos = GetPos();
 
 	// 2Dポリゴン更新処理
 	CScene2D::Update();
@@ -135,42 +131,6 @@ void CShock::SetShock(COLOR_TYPE Ctype)
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CShock::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/shock003.png",
-		&m_apTexture[0]);
-
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/shock002.png",
-		&m_apTexture[1]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CShock::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_SHOCK_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // スケールアップ
 //=============================================================================
 void CShock::SizeUp(void)
@@ -193,7 +153,7 @@ void CShock::SizeUp(void)
 		return;
 	}
 	// サイズを渡す
-	SetSize2D(size);
+	SetSize(size);
 }
 
 //=============================================================================

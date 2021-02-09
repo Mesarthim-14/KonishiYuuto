@@ -2,7 +2,7 @@
 #define _GAGE_H_
 //=============================================================================
 //
-// ゲージクラスヘッダー		[gage.h]
+// ゲージクラスヘッダー	[gage.h]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -18,7 +18,6 @@
 //=============================================================================
 #define GAGE_SIZE_X			(10)			// ゲージのサイズ
 #define GAGE_SIZE_Y			(300)			// ゲージのサイズ
-#define MAX_GAGE_TEXTURE	(3)				// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -56,8 +55,6 @@ public:
 	void Draw(void);											// 描画処理
 
 	static CGage * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, GAGE_TYPE Gtype);
-	static HRESULT Load(void);
-	static void UnLoad(void);
 
 	void SetInfo(D3DXVECTOR3 pos, D3DXVECTOR3 size, GAGE_TYPE Gtype);	// ゲージの情報設定
 	void AddGage(int nNumber);											// ゲージ量加算
@@ -66,7 +63,6 @@ public:
 	void GetPlayerColor(void);											// プレイヤーの色を取得
 
 private:
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_GAGE_TEXTURE];	// テクスチャ情報のポインタ
 	D3DXVECTOR3 m_Pos;											// 座標
 	D3DXVECTOR3 m_Move;											// 移動量
 	D3DXVECTOR3 m_Size;											// サイズ

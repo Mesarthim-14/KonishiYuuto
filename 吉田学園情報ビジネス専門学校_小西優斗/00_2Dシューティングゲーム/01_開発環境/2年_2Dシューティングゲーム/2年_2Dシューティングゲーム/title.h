@@ -23,7 +23,6 @@ class CTitleBg;
 class CTitle
 {
 public:
-
 	CTitle();		// コンストラクタ
 	~CTitle();		// デストラクタ
 

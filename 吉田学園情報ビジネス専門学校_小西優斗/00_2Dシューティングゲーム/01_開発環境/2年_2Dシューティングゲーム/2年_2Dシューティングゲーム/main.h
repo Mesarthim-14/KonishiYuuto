@@ -28,4 +28,15 @@ DWORD GetBossCurrentTime(void);
 DWORD GetBossGameTime(void);
 DWORD GetBossStartTime(void);
 
+//=============================================================================
+// 構造体定義
+//=============================================================================
+typedef struct
+{
+	D3DXVECTOR3 pos;	// 頂点座標
+	float rhw;			// 座標
+	D3DCOLOR col;		// 頂点カラー
+	D3DXVECTOR2 tex;	// テクスチャ座標
+}VERTEX_2D;
+
 #endif

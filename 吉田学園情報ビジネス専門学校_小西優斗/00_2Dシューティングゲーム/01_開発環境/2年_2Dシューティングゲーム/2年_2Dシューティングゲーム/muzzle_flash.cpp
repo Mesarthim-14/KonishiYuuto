@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// マズルフラッシュ処理 [muzzle_flash.cpp]
+// マズルフラッシュクラス [muzzle_flash.cpp]
 // Author : Konishi Yuuto
 //
 //=============================================================================
@@ -14,6 +14,7 @@
 #include "player.h"
 #include "sound.h"
 #include "game.h"
+#include "texture.h"
 
 //=============================================================================
 // マクロ定義
@@ -21,11 +22,6 @@
 #define MUZZLE_FLASH_ANGLE		(30)	// 角度
 #define MUZZLE_FLASH_SPPED		(1)		// 速度
 #define MUZZLE_FLASH_DISTANCE	(28)	// 発生距離
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CMuzzleFlash::m_apTexture[MAX_MUZZLE_FLASH_TEXTURE] = {};
 
 //=============================================================================
 // インスタンス生成
@@ -63,7 +59,7 @@ CMuzzleFlash * CMuzzleFlash::Create(D3DXVECTOR3 pos,
 		pMuzzleFlash->InitColor();
 
 		// テクスチャ設定
-		pMuzzleFlash->BindTexture(m_apTexture[0]);
+		pMuzzleFlash->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_EFFECT));
 
 		// 体力の設定
 		pMuzzleFlash->m_nLife = nLife;
@@ -73,42 +69,9 @@ CMuzzleFlash * CMuzzleFlash::Create(D3DXVECTOR3 pos,
 }
 
 //=============================================================================
-// テクスチャロード
-//=============================================================================
-HRESULT CMuzzleFlash::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/effect000.jpg",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//=============================================================================
-// テクスチャアンロード
-//=============================================================================
-void CMuzzleFlash::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_MUZZLE_FLASH_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
-CMuzzleFlash::CMuzzleFlash()
+CMuzzleFlash::CMuzzleFlash() : CEffect(TYPE_EFFECT)
 {
 	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -250,7 +213,7 @@ void CMuzzleFlash::GetPlayerPos(void)
 	if (nNum % 2 == 0)
 	{
 		// ターゲットの情報確保
-		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPosition().x - PLAYER_SHOT_POS_X, pPlayer->GetPosition().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
+		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPos().x - PLAYER_SHOT_POS_X, pPlayer->GetPos().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
 
 		// 位置を更新
 		D3DXVECTOR3 TargetMove = D3DXVECTOR3(Target.x - m_TargetOld.x, Target.y - m_TargetOld.y, 0.0f);
@@ -266,7 +229,7 @@ void CMuzzleFlash::GetPlayerPos(void)
 	else
 	{
 		// ターゲットの情報確保
-		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPosition().x + PLAYER_SHOT_POS_X, pPlayer->GetPosition().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
+		D3DXVECTOR3 Target = D3DXVECTOR3(pPlayer->GetPos().x + PLAYER_SHOT_POS_X, pPlayer->GetPos().y - PLAYER_SHOT_POS_Y + 10, 0.0f);
 
 		// 位置を更新
 		D3DXVECTOR3 TargetMove = D3DXVECTOR3(Target.x - m_TargetOld.x, Target.y - m_TargetOld.y, 0.0f);

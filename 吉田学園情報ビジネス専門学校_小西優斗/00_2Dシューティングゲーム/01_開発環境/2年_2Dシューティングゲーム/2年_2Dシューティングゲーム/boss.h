@@ -17,7 +17,6 @@
 //=============================================================================
 #define BOSS_SIZE_X			(150)			// ボスのサイズ
 #define BOSS_SIZE_Y			(150)			// ボスのサイズ
-#define MAX_BOSS_TEXTURE	(1)				// テクスチャの数
 
 //=============================================================================
 // 前方宣言
@@ -51,8 +50,9 @@ public:
 	void Update(void);														// 更新処理
 	void Draw(void);														// 描画処理
 	static CBoss * Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);	// ポリゴン生成
-	static HRESULT Load(void);												// テクスチャロード
-	static void UnLoad(void);												// テクスチャアンロード
+
+	void MoveUpdate(void);
+	void BulletUpdate(void);
 
 	void AppearanceMove(void);												// 登場時の移動量
 	void FirstUpdateMove(void);												// エネミーの移動
@@ -80,8 +80,7 @@ public:
 private:
 	D3DXVECTOR3 m_Pos;												// 座標
 	D3DXVECTOR3 m_Move;												// 移動
-	static LPDIRECT3DTEXTURE9 m_apTexture[MAX_BOSS_TEXTURE];		// テクスチャ情報のポインタ
-	ENEMY_STATE m_State;											// エネミーの状態
+	STATE m_State;											// エネミーの状態
 	BOSS_PHASE m_Fhase;												// フェーズ
 	int m_nLife;													// ライフ
 	int m_nStateCnt;												// エネミーの状態カウンター

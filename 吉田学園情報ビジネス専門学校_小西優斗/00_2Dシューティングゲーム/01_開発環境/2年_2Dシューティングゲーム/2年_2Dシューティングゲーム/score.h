@@ -30,7 +30,7 @@ class CNumber;
 class CScore : public CScene
 {
 public:
-	CScore();				// コンストラクタ
+	CScore(TYPE Priority = TYPE_SCORE);				// コンストラクタ
 	~CScore();				// デストラクタ
 
 	// メンバ関数

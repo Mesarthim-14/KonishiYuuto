@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "sound.h"
+#include "texture.h"
 
 //====================================================================
 // マクロ定義
@@ -22,11 +23,6 @@
 #define ICON_COLOR_MIN			(0)			// カラー変更の最小
 #define ICON_CHANGE_TIME		(35)		// カラーを変えるフレーム
 #define ICON_USE_TIME			(210)		// アイコンの出現時間
-
-//=============================================================================
-// static初期化
-//=============================================================================
-LPDIRECT3DTEXTURE9 CIcon::m_apTexture[MAX_ICON_TEXTURE] = {};
 
 //====================================================================
 // ポリゴン生成
@@ -40,8 +36,9 @@ CIcon * CIcon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	{
 		// 初期化処理
 		pWarning->Init(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), type);
+
 		// テクスチャの設定
-		pWarning->BindTexture(m_apTexture[0]);
+		pWarning->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_ICON));
 
 		// サイズを代入
 		pWarning->m_size = size;
@@ -53,7 +50,7 @@ CIcon * CIcon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 //====================================================================
 // コンストラクタ
 //====================================================================
-CIcon::CIcon()
+CIcon::CIcon() : CScene2D(TYPE_UI)
 {
 	m_fScale = 0.0f;
 	m_fScaleNum = 0.0f;
@@ -94,6 +91,7 @@ void CIcon::Uninit(void)
 {
 	// 終了処理
 	CScene2D::Uninit();
+	Release();
 }
 
 //====================================================================
@@ -131,39 +129,6 @@ void CIcon::Draw(void)
 }
 
 //====================================================================
-// テクスチャロード
-//====================================================================
-HRESULT CIcon::Load(void)
-{
-	// レンダラーの情報を受け取る
-	CRenderer *pRenderer = NULL;
-	pRenderer = CManager::GetRenderer();
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice, "date/TEXTURE/icon002.png",
-		&m_apTexture[0]);
-
-	return S_OK;
-}
-
-//====================================================================
-// テクスチャアンロード
-//====================================================================
-void CIcon::UnLoad(void)
-{
-	for (int nCount = 0; nCount < MAX_ICON_TEXTURE; nCount++)
-	{
-		// テクスチャの開放
-		if (m_apTexture[nCount] != NULL)
-		{
-			m_apTexture[nCount]->Release();
-			m_apTexture[nCount] = NULL;
-		}
-	}
-}
-
-//====================================================================
 // 拡大
 //====================================================================
 void CIcon::ScaleUp(void)
@@ -176,7 +141,7 @@ void CIcon::ScaleUp(void)
 		D3DXVECTOR3 size = D3DXVECTOR3(m_size.x * m_fScale, m_size.y * m_fScale, 0.0f);
 
 		// Scene2Dにサイズを渡す
-		SetSize2D(size);
+		SetSize(size);
 	}
 	else
 	{
@@ -198,7 +163,7 @@ void CIcon::ScaleDown(void)
 		D3DXVECTOR3 size = D3DXVECTOR3(m_size.x * m_fScale, m_size.y * m_fScale, 0.0f);
 
 		// Scene2Dにサイズを渡す
-		SetSize2D(size);
+		SetSize(size);
 	}
 	else
 	{

@@ -13,11 +13,12 @@
 #include "renderer.h"
 #include "number.h"
 #include "player.h"
+#include "texture.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CRemain::CRemain()
+CRemain::CRemain(TYPE Priority):CScene(Priority)
 {
 	m_pRemain = NULL;
 	m_nRemain = PLAYER_REMAIN_NUM;
@@ -36,13 +37,17 @@ CRemain::~CRemain()
 //=============================================================================
 HRESULT CRemain::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
-	// 数字のメモリ確保
-	m_pRemain = CNumber::Create(pos, size, type, CNumber::NUMBER_TYPE_NONE);
-
-	if (m_pRemain != NULL)
+	if (m_pRemain == NULL)
 	{
-		// 数字の設定
-		m_pRemain->SetNumber(PLAYER_REMAIN_NUM);
+		// 数字のメモリ確保
+		m_pRemain = CNumber::Create(pos, size, type, CNumber::NUMBER_TYPE_NONE);
+		m_pRemain->BindTexture(CTexture::GetTexture(CTexture::TEXTURE_NUM_NUMBER_000));
+
+		if (m_pRemain != NULL)
+		{
+			// 数字の設定
+			m_pRemain->SetNumber(PLAYER_REMAIN_NUM);
+		}
 	}
 
 	return S_OK;
