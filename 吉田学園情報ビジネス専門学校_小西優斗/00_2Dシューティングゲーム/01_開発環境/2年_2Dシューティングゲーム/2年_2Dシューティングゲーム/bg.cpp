@@ -64,9 +64,9 @@ HRESULT CBackground::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 		if (m_apScene2D[nCount] == NULL)
 		{
 			// 初期化処理
-			m_apScene2D[nCount] = new CScene2D;									// メモリ確保
+			m_apScene2D[nCount] = new CScene2D;				// メモリ確保
 			m_apScene2D[nCount]->InitScroll(BG_SPEED, BG_DIVISION_BASE + BG_DIVISION*(float)nCount);	// スクロール情報
-			m_apScene2D[nCount]->Init(pos, size, type);							// 初期化情報
+			m_apScene2D[nCount]->Init(pos, size, type);													// 初期化情報
 			m_apScene2D[nCount]->BindTexture(CTexture::GetTexture((CTexture::TEXTURE_TYPE)((int)CTexture::TEXTURE_NUM_BG_000 + nCount)));				// テクスチャ情報
 
 		}
