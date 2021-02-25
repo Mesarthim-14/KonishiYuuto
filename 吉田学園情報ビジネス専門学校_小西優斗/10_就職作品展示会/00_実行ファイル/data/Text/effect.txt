@@ -17,7 +17,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 
-	SIZE = 90.0 90.0 0.0			# サイズ
+	SIZE = 120.0 120.0 0.0			# サイズ
 	MOVE = 5.0 5.0 5.0				# 移動量
 	DISTANCE = 150.0 150.0 150.0	# 距離
 	LIFE = 35						# 体力
@@ -37,7 +37,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 
-	SIZE = 65.0 65.0 0.0			# サイズ
+	SIZE = 80.0 80.0 0.0			# サイズ
 	MOVE = 5.0 5.0 5.0				# 移動量
 	DISTANCE = 150.0 150.0 150.0	# 距離
 	LIFE = 70						# 体力
@@ -105,7 +105,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 45					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -117,7 +117,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 200.0 200.0 0.0			# サイズ
+	SIZE = 2000.0 2000.0 0.0			# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 50.0 50.0 50.0		# 距離
 	LIFE = 50						# 体力
@@ -125,7 +125,7 @@ PARTICLESET
 	COLOR = 0.6 0.3 0.6 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 1						# アルファテスト
-	ALPHANUM = 0					# アルファテストの値
+	ALPHANUM = 100					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -137,7 +137,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 500.0 500.0 0.0			# サイズ
+	SIZE = 1200.0 1200.0 0.0			# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 50.0 50.0 50.0		# 距離
 	LIFE = 100						# 体力
@@ -157,7 +157,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 150.0 150.0 0.0			# サイズ
+	SIZE = 500.0 500.0 0.0			# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 30.0 -1.0 30.0		# 距離
 	LIFE = 50						# 体力
@@ -165,7 +165,7 @@ PARTICLESET
 	COLOR = 1.0 0.8 0.2 1.0			# 色
 	GRAVITY = 1						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -177,7 +177,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 150.0 150.0 0.0			# サイズ
+	SIZE = 300.0 300.0 0.0			# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 30.0 -1.0 30.0		# 距離
 	LIFE = 50						# 体力
@@ -185,7 +185,7 @@ PARTICLESET
 	COLOR = 1.0 0.8 0.2 1.0			# 色
 	GRAVITY = 1						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -197,12 +197,12 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 1700.0 1700.0 0.0		# サイズ
+	SIZE = 1900.0 1900.0 0.0		# サイズ
 	MOVE = 1.0 1.0 1.0				# 移動量
 	DISTANCE = 300.0 70.0 300.0		# 距離
 	LIFE = 130						# 体力
 	NUM = 7							# 数
-	COLOR = 1.0 1.0 1.0 0.5			# 色
+	COLOR = 0.9 0.9 0.9 0.5			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
 	ALPHANUM = 30					# アルファテストの値
@@ -217,7 +217,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 2100.0 0.0 2100.0		# サイズ
+	SIZE = 2200.0 0.0 2200.0		# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 1.0 1.0 1.0			# 距離
 	LIFE = 130						# 体力
@@ -225,7 +225,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 30					# アルファテストの値
+	ALPHANUM = 40					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 1						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -237,7 +237,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 2200.0 2200.0 0.0		# サイズ
+	SIZE = 2300.0 2300.0 0.0		# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 1.0 1.0 1.0			# 距離
 	LIFE = 130						# 体力
@@ -245,7 +245,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 0.5			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -257,7 +257,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 600.0 700.0 0.0			# サイズ
+	SIZE = 800.0 900.0 0.0			# サイズ
 	MOVE = 0.0 6.0 0.0				# 移動量
 	DISTANCE = 600.0 700.0 600.0	# 距離
 	LIFE = 130						# 体力
@@ -265,7 +265,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 0.0 0.1			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -277,15 +277,15 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 500.0 600.0 0.0			# サイズ
+	SIZE = 1200.0 1200.0 0.0		# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 1.0 1.0 1.0			# 距離
 	LIFE = 130						# 体力
 	NUM = 1							# 数
-	COLOR = 0.3 0.3 0.3 0.4			# 色
+	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
-	ALPHA = 1						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 10					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -305,7 +305,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 0					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 1					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -325,7 +325,7 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 0					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 0					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -341,11 +341,11 @@ PARTICLESET
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 1.0 1.0 1.0			# 距離
 	LIFE = 30						# 体力
-	NUM = 1							# 数
+	NUM = 2							# 数
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 0					# アルファテストの値
+	ALPHANUM = 50					# アルファテストの値
 	ANIMATION = 0					# テクスチャアニメーションの設定
 	BLEND = 0						# 加算合成
 	PRIORITY = 5					# 描画優先順位
@@ -357,7 +357,7 @@ PARTICLESET
 	#=======================================
 	EFFECTSET
 	
-	SIZE = 450.0 450.0 0.0			# サイズ
+	SIZE = 650.0 650.0 0.0			# サイズ
 	MOVE = 0.0 0.0 0.0				# 移動量
 	DISTANCE = 1.0 1.0 1.0			# 距離
 	LIFE = 25						# 体力
@@ -365,12 +365,154 @@ PARTICLESET
 	COLOR = 1.0 1.0 1.0 1.0			# 色
 	GRAVITY = 0						# 重力
 	ALPHA = 0						# アルファテスト
-	ALPHANUM = 20					# アルファテストの値
+	ALPHANUM = 40					# アルファテストの値
 	ANIMATION = 0					# テクスチャアニメーションの設定
 	BLEND = 1						# 加算合成
 	PRIORITY = 5					# 描画優先順位
 
 	END_EFFECTSET
+	
+	#=======================================
+	# 攻撃時の円(ATTACK_SMALL_CIRCLE)[18]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 1000.0 0.0 1000.0		# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 1000						# 体力
+	NUM = 1							# 数
+	COLOR = 1.0 1.0 1.0 2.0			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 50					# アルファテストの値
+	ANIMATION = 1					# テクスチャアニメーションの設定
+	BLEND = 0						# 加算合成
+	PRIORITY = 4					# 描画優先順位
+
+	END_EFFECTSET
+	
+	#=======================================
+	# 手の光(ARM_LIGHT)[19]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 2500.0 2500.0 0.0		# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 80						# 体力
+	NUM = 1							# 数
+	COLOR = 1.0 1.0 1.0 1.0			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 20					# アルファテストの値
+	ANIMATION = 1					# テクスチャアニメーションの設定
+	BLEND = 0						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
+	
+	#=======================================
+	# ガード時のパーティクル(GUARD_PARTICLE)[20]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 25.0 25.0 0.0			# サイズ
+	MOVE = 11.0 5.0 11.0			# 移動量
+	DISTANCE = 20.0 300.0 20.0		# 距離
+	LIFE = 30						# 体力
+	NUM = 50						# 数
+	COLOR = 0.2 1.0 0.3 1.0			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 70					# アルファテストの値
+	ANIMATION = 0					# テクスチャアニメーションの設定
+	BLEND = 0						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
+	
+	#=======================================
+	# ダッシュ時の衝撃(DUSH_IMPACT)[21]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 300.0 0.0 300.0			# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 20						# 体力
+	NUM = 1							# 数
+	COLOR = 0.9 0.9 0.9 0.7			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 40					# アルファテストの値
+	ANIMATION = 0					# テクスチャアニメーションの設定
+	BLEND = 0						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
+	
+	#=======================================
+	# ダメージ時のエフェクト(DAMAGE_EFFECT)[22]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 1500.0 1500.0 0.0			# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 30						# 体力
+	NUM = 1							# 数
+	COLOR = 1.0 1.0 1.0 1.0			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 70					# アルファテストの値
+	ANIMATION = 1					# テクスチャアニメーションの設定
+	BLEND = 1						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
+
+	#=======================================
+	# 咆哮時のファイア(ROAR_FIRE)[23]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 600.0 10000.0 0.0		# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 150						# 体力
+	NUM = 1							# 数
+	COLOR = 0.9 0.9 0.9 0.9			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 70					# アルファテストの値
+	ANIMATION = 1					# テクスチャアニメーションの設定
+	BLEND = 1						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
+	
+	#=======================================
+	# 咆哮時の光(ROAR_LIGHT)[24]
+	#=======================================
+	EFFECTSET
+	
+	SIZE = 1800.0 1800.0 0.0			# サイズ
+	MOVE = 0.0 0.0 0.0				# 移動量
+	DISTANCE = 1.0 1.0 1.0			# 距離
+	LIFE = 150						# 体力
+	NUM = 1							# 数
+	COLOR = 1.0 1.0 1.0 1.0			# 色
+	GRAVITY = 0						# 重力
+	ALPHA = 0						# アルファテスト
+	ALPHANUM = 70					# アルファテストの値
+	ANIMATION = 1					# テクスチャアニメーションの設定
+	BLEND = 0						# 加算合成
+	PRIORITY = 5					# 描画優先順位
+
+	END_EFFECTSET
 END_PARTICLESET
+
+
 
 END_SCRIPT
